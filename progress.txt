@@ -216,3 +216,12 @@
   - Tests: 410 passing (18 new tests for CommitItem)
   - Commit: 23e5163 feat(ui): extract CommitItem into standalone component
 
+✅ 2026-01-08: Created PhaseIndicator component with pulsing animation
+  - Created src/components/PhaseIndicator.tsx for displaying current phase
+  - Phase-specific icons: ○ idle, ◐ reading, ✎ editing, ⚡ running, ● thinking, ✓ done
+  - Phase-specific labels: Waiting, Reading, Editing, Running, Thinking, Done
+  - Uses usePulse hook for animated pulse effect on active phases (dims between cyan/gray)
+  - Exports getPhaseIcon() and getPhaseDisplayLabel() helper functions
+  - Tests: 438 passing (28 new tests for PhaseIndicator)
+  - Commit: 8d82967 feat(ui): add PhaseIndicator component with pulsing animation
+

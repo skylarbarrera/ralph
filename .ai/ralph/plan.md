@@ -1,24 +1,28 @@
 ## Goal
-Extract ToolActivityItem from ActivityFeed into standalone component (handles both tool_start and tool_complete).
+Create PhaseIndicator component that shows current phase with pulsing animation for active phases.
 
 ## Files
-- src/components/ToolActivityItem.tsx - new component with ToolStartItem and ToolCompleteItem
-- tests/ToolActivityItem.test.tsx - unit tests
-- src/components/ActivityFeed.tsx - update to import from ToolActivityItem.tsx
+- src/components/PhaseIndicator.tsx - new component
+- tests/PhaseIndicator.test.tsx - unit tests
+
+## Design
+PhaseIndicator displays the current phase with:
+- Pulsing animation (using usePulse hook) for non-done phases
+- Phase-specific icons: ◐ reading, ✎ editing, ⚡ running, ● thinking, ✓ done, ○ idle
+- Color based on phase state (cyan for active, green for done, gray for idle)
+- Text shows phase label with visual pulse effect (dimmed text toggle)
+
+Pattern: `│ {icon} {phase label}` where icon pulses between bright/dim
 
 ## Tests
-- ToolStartItem renders spinner with tool displayName
-- ToolStartItem uses category-based color for spinner
-- ToolCompleteItem renders checkmark icon for success
-- ToolCompleteItem renders error icon for errors
-- ToolCompleteItem shows duration in seconds
-- Both render border character (│) with proper indentation
-- Handles empty displayName
-- Handles different tool categories (read/write/command/meta)
+- Renders correct icon for each phase
+- Renders phase label text
+- Shows pulsing effect for non-done phases
+- No pulsing for done phase
+- Uses correct colors from ELEMENT_COLORS/COLORS
 
 ## Exit Criteria
-- ToolActivityItem.tsx created with exported ToolStartItem and ToolCompleteItem
+- Component renders all phases correctly
+- Pulsing animation works for active phases
 - Tests pass with good coverage
-- ActivityFeed updated to import from new file
-- All existing tests still pass
 - Changes committed

@@ -146,3 +146,15 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 392 passing (25 new)
 - notes: ToolStartItem (spinner + displayName), ToolCompleteItem (✓/✗ + duration); category-based colors
 - next: Create CommitItem, PhaseIndicator components
+
+## 23e5163 — Extract CommitItem into standalone component
+- files: src/components/CommitItem.tsx, tests/CommitItem.test.tsx, src/components/ActivityFeed.tsx
+- tests: 410 passing (18 new)
+- notes: Displays │ ✓ {short hash (7 chars)} - {message}; ActivityFeed imports from CommitItem.tsx
+- next: Create PhaseIndicator component
+
+## 8d82967 — Add PhaseIndicator component with pulsing animation
+- files: src/components/PhaseIndicator.tsx, tests/PhaseIndicator.test.tsx
+- tests: 438 passing (28 new)
+- notes: Phase icons (○◐✎⚡●✓), labels, usePulse for active phases; cyan/gray pulsing effect
+- next: Update IterationHeader, TaskTitle, StatusBar with Claude Code styling
