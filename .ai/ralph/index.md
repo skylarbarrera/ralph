@@ -158,3 +158,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 438 passing (28 new)
 - notes: Phase icons (○◐✎⚡●✓), labels, usePulse for active phases; cyan/gray pulsing effect
 - next: Update IterationHeader, TaskTitle, StatusBar with Claude Code styling
+
+## 6b946d5 — Add pulse effect to TaskTitle for pending state
+- files: src/components/TaskTitle.tsx, tests/TaskTitle.test.tsx
+- tests: 445 passing (6 new)
+- notes: isPending prop enables usePulse; ELEMENT_COLORS for styling; icon pulses green/gray
+- next: Update StatusBar with commit info and Claude Code colors

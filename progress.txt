@@ -233,3 +233,11 @@
   - Tests: 439 passing (1 new test for ELEMENT_COLORS integration)
   - Commit: dc8a07c refactor(ui): update IterationHeader to use ELEMENT_COLORS
 
+✅ 2026-01-08: Added pulse effect to TaskTitle (Component Updates - Styling)
+  - Added isPending prop to TaskTitle component (defaults to false)
+  - Integrated usePulse hook for animated pulse effect when pending
+  - Used ELEMENT_COLORS for consistent styling (border, success, text, muted)
+  - Icon color alternates between green and gray when isPending=true
+  - Tests: 445 passing (6 new tests for pending state and pulse effect)
+  - Commit: 6b946d5 feat(ui): add pulse effect to TaskTitle for pending state
+

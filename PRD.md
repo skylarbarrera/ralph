@@ -72,7 +72,7 @@ Enhance Ralph CLI with Claude Code-style activity feed, better pending states, a
 
 ### Component Updates - Styling
 - [x] Update `src/components/IterationHeader.tsx` - bold text, cyan borders
-- [ ] Update `src/components/TaskTitle.tsx` - add pulse effect for pending
+- [x] Update `src/components/TaskTitle.tsx` - add pulse effect for pending
 - [ ] Update `src/components/StatusBar.tsx` - show commit info, Claude Code colors
 
 ### Integration
