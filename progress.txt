@@ -143,3 +143,12 @@
   - Tests: 277 passing (9 new tests for activity log)
   - Commit: d409c6f feat(state): add activity log and output tracking
 
+✅ 2026-01-08: Added git commit parsing (Data Layer - Git Commit Parsing)
+  - Added isGitCommitCommand() to detect `git commit` commands
+  - Added parseGitCommitOutput() with regex `/^\[[\w/-]+\s+([a-f0-9]{7,40})\]\s+(.+)$/m`
+  - Integrated into handleToolEnd() - detects Bash git commit commands
+  - Sets lastCommit state when commit is detected
+  - Adds commit activity item to activity log
+  - Tests: 299 passing (22 new tests for git commit parsing)
+  - Commit: 2c49b20 feat(state): add git commit parsing and detection
+

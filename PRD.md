@@ -49,10 +49,10 @@ Enhance Ralph CLI with Claude Code-style activity feed, better pending states, a
 - [x] Add thoughts to activity log in `handleText()`
 
 ### Data Layer - Git Commit Parsing
-- [ ] Add `isGitCommitCommand()` method to detect git commit commands
-- [ ] Add `parseGitCommitOutput()` method with regex `/^\[[\w/-]+\s+([a-f0-9]{7,40})\]\s+(.+)$/m`
-- [ ] Parse and store commit hash + message when Bash runs git commit
-- [ ] Add commit as activity item when detected
+- [x] Add `isGitCommitCommand()` method to detect git commit commands
+- [x] Add `parseGitCommitOutput()` method with regex `/^\[[\w/-]+\s+([a-f0-9]{7,40})\]\s+(.+)$/m`
+- [x] Parse and store commit hash + message when Bash runs git commit
+- [x] Add commit as activity item when detected
 
 ### Hook Updates
 - [ ] Add `activityLog` to `ClaudeStreamState` in `src/hooks/useClaudeStream.ts`

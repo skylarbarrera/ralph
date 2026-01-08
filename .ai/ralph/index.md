@@ -104,3 +104,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 277 passing (9 new)
 - notes: ActivityItem type (thought/tool_start/tool_complete/commit), output in CompletedTool, activityLog capped at 50 items
 - next: Add git commit parsing to detect and log commits
+
+## 2c49b20 — Add git commit parsing and detection
+- files: src/lib/state-machine.ts, tests/state-machine.test.ts
+- tests: 299 passing (22 new)
+- notes: isGitCommitCommand() detects git commit; parseGitCommitOutput() extracts hash+message; integrated into handleToolEnd()
+- next: Add activityLog and lastCommit to useClaudeStream hook
