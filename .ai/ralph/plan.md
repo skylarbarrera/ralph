@@ -1,21 +1,18 @@
 ## Goal
-Create a JSONL logger that tees raw Claude output to disk for debugging and replay.
+Create the IterationHeader Ink component that displays iteration progress with elapsed time.
 
 ## Files
-- src/lib/logger.ts - JSONL logger class with file writing
-- tests/logger.test.ts - Unit tests for logger
+- src/components/IterationHeader.tsx - New component: `┌─ Iteration 1/10 ──── 0:42 elapsed`
+- tests/IterationHeader.test.tsx - Unit tests for rendering
 
 ## Tests
-- Creates runs directory if it doesn't exist
-- Writes JSONL lines to timestamped file
-- Handles multiple log calls correctly
-- Properly closes file handle
-- Uses correct ISO timestamp format for filename
-- Handles write errors gracefully
+- Renders current/total iteration numbers correctly
+- Formats elapsed time correctly (seconds, minutes:seconds, hours:minutes:seconds)
+- Handles edge cases (iteration 0, large numbers)
+- Renders with proper box-drawing characters
 
 ## Exit Criteria
-- Logger creates `./runs/{ISO-timestamp}.jsonl` files
-- Creates runs directory automatically if needed
-- All tests pass with 80%+ coverage
-- No type errors
+- Component renders iteration header matching PRD design
+- Tests pass with 80%+ coverage
+- TypeScript compiles without errors
 - Changes committed
