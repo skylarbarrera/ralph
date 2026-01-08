@@ -20,12 +20,15 @@ fi
 LINTER="npm run lint"  # Change this to your linter command
 
 for ((i=1; i<=$1; i++)); do
-  result=$(claude --permission-mode acceptEdits -p "\\
-  1. Run the linter: ${LINTER} \\
-  2. Identify ONE linting error or warning. \\
-  3. Fix that error by modifying the code. \\
-  4. Run the linter again to verify the fix. \\
-  5. Commit the fix with a clear message. \\
+  result=$(claude --permission-mode acceptEdits -p "@.ai/ralph/index.md \\
+  1. Read last 3 entries from index.md for context. \\
+  2. Run the linter: ${LINTER} \\
+  3. Identify ONE linting error or warning. \\
+  4. Write plan to .ai/ralph/plan.md (which error, how to fix, verification). \\
+  5. Fix that error by modifying the code. \\
+  6. Run the linter again to verify the fix. \\
+  7. Commit the fix with clear message. \\
+  8. Append summary to .ai/ralph/index.md (format: ## SHA — task). \\
   ONLY FIX ONE ERROR AT A TIME. \\
   If there are no linting errors, output <promise>COMPLETE</promise>.")
 

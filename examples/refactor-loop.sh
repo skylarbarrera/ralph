@@ -19,13 +19,16 @@ fi
 DETECTION="jscpd ."  # Change this to your duplication detection tool
 
 for ((i=1; i<=$1; i++)); do
-  result=$(claude --permission-mode acceptEdits -p "\\
-  1. Run duplication detection: ${DETECTION} \\
-  2. Identify ONE instance of code duplication or code smell. \\
-  3. Refactor it into a shared utility or helper function. \\
-  4. Update all call sites to use the new shared code. \\
-  5. Run tests to verify nothing broke. \\
-  6. Commit the refactoring with a clear message. \\
+  result=$(claude --permission-mode acceptEdits -p "@.ai/ralph/index.md \\
+  1. Read last 3 entries from index.md for context. \\
+  2. Run duplication detection: ${DETECTION} \\
+  3. Identify ONE instance of code duplication or code smell. \\
+  4. Write plan to .ai/ralph/plan.md (what to extract, where, call sites). \\
+  5. Refactor it into a shared utility or helper function. \\
+  6. Update all call sites to use the new shared code. \\
+  7. Run tests to verify nothing broke. \\
+  8. Commit the refactoring with clear message. \\
+  9. Append summary to .ai/ralph/index.md (format: ## SHA — task). \\
   ONLY REFACTOR ONE DUPLICATION AT A TIME. \\
   If no duplication or code smells are found, output <promise>COMPLETE</promise>.")
 

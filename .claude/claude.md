@@ -256,8 +256,65 @@ npx bundlephobia <package>
 Before starting work in a Ralph loop, ALWAYS read:
 - `PRD.md` - Project requirements and task list
 - `progress.txt` - What has already been completed
+- `.ai/ralph/index.md` - Last 3-5 commit summaries (for context)
 
 Use these to determine what task to work on next.
+
+### Memory System (.ai/ralph/)
+
+Ralph uses commit-anchored memory to maintain context efficiently.
+
+**Two files:**
+
+1. **`.ai/ralph/plan.md`** - Current task plan (overwritten each iteration)
+   - Written BEFORE implementation starts
+   - Defines scope, files, tests, exit criteria
+   - Prevents scope creep
+
+2. **`.ai/ralph/index.md`** - Commit history log (append-only)
+   - Written AFTER each successful commit
+   - One entry per commit, keyed by SHA
+   - 5-7 lines max per entry
+
+**Planning Phase (MANDATORY):**
+
+Before implementing any task:
+1. Read PRD, progress.txt, and last 3 entries from index.md
+2. Write plan to `.ai/ralph/plan.md` using this format:
+```markdown
+## Goal
+One sentence describing what this iteration accomplishes.
+
+## Files
+- src/feature.ts - add new function
+- tests/feature.test.ts - unit tests
+
+## Tests
+- Test scenario 1
+- Test scenario 2
+
+## Exit Criteria
+- Function works with valid input
+- Tests pass with 80%+ coverage
+- Changes committed
+```
+
+**Memory Index Format:**
+
+After committing, append to `.ai/ralph/index.md`:
+```markdown
+## abc1234 — Add user authentication
+- files: src/auth.ts, tests/auth.test.ts
+- tests: 12 passing
+- notes: Used bcrypt for password hashing
+- next: Add password reset endpoint
+```
+
+**Hard Rules:**
+- No commit = no index entry
+- Plan must exist before coding starts
+- Keep summaries concise (context window optimization)
+- Read index.md only for last 3-5 commits (not entire history)
 
 ### Task Completion Criteria
 A task is ONLY complete when:

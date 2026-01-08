@@ -137,6 +137,108 @@ chmod +x .git/hooks/pre-commit
 
 See `.claude/hooks/README.md` for creating custom hooks (coverage checks, bundle size limits, security audits, etc.).
 
+## Memory System (.ai/ralph/)
+
+Ralph now includes **commit-anchored memory** to maintain context efficiently across iterations without bloating token usage.
+
+### How It Works
+
+**Two files track progress:**
+
+1. **`.ai/ralph/plan.md`** - Current task plan (overwritten each iteration)
+   - Written BEFORE implementation starts
+   - Defines: goal, files to modify, tests to write, exit criteria
+   - Prevents scope creep - Claude commits to a plan before coding
+
+2. **`.ai/ralph/index.md`** - Commit history log (append-only)
+   - Written AFTER each successful commit
+   - One entry per commit, keyed by SHA
+   - 5-7 lines max per entry
+   - Provides compressed context from previous iterations
+
+### The Planning Phase
+
+Every iteration follows this flow:
+
+```
+1. Read PRD + progress.txt + last 3 entries from index.md
+2. Pick next incomplete task
+3. Write plan.md (what, where, how, done-when)
+4. Execute the plan
+5. Run tests
+6. Commit changes
+7. Append summary to index.md
+8. Update progress.txt
+```
+
+### Example plan.md
+
+```markdown
+## Goal
+Add JWT authentication to API endpoints.
+
+## Files
+- src/auth.ts - create auth service with token generation
+- src/middleware/auth.ts - JWT verification middleware
+- tests/auth.test.ts - unit tests for auth service
+
+## Tests
+- Token generation with valid credentials
+- Token verification succeeds with valid token
+- Token verification fails with expired/invalid token
+- Middleware blocks unauthenticated requests
+
+## Exit Criteria
+- All tests pass with 80%+ coverage
+- Endpoints protected by auth middleware
+- No security vulnerabilities
+- Changes committed with clear message
+```
+
+### Example index.md Entry
+
+```markdown
+## a3f5c21 — Add JWT authentication
+- files: src/auth.ts, src/middleware/auth.ts, tests/auth.test.ts
+- tests: 12 passing
+- notes: Used jsonwebtoken library, tokens expire in 24h
+- next: Add password reset flow
+```
+
+### Benefits
+
+**Context efficiency:**
+- Read last 3-5 commits instead of entire git history
+- Claude gets compressed, relevant context
+- Saves tokens on every iteration
+
+**Scope control:**
+- Plan written before coding prevents feature creep
+- Clear exit criteria define "done"
+- One task per iteration enforced by structure
+
+**Visibility:**
+- See what's about to happen (plan.md)
+- See what happened (index.md)
+- Track progress without reading full git log
+
+**Memory persistence:**
+- Context survives across sessions
+- Resume work without re-explaining history
+- New Claude instances can pick up where you left off
+
+### File Locations
+
+The `.ai/` directory is for AI runtime artifacts (separate from `.claude/` config):
+
+```
+.ai/ralph/
+├── plan.md    # Current iteration plan
+└── index.md   # Commit history log
+```
+
+This separation allows portability - if you switch from Claude Code to another AI tool, memory format stays consistent.
+
 ## Usage
 
 ### Human-in-the-Loop Mode
@@ -390,6 +492,10 @@ ralph/
 ├── PRD.md                         # Example PRD (todo app)
 ├── progress.txt                   # Progress tracking
 ├── .gitignore                     # Common ignores
+├── .ai/
+│   └── ralph/
+│       ├── plan.md                # Current task plan (overwritten)
+│       └── index.md               # Commit history log (append-only)
 ├── .claude/
 │   ├── claude.md                  # Coding standards and preferences
 │   └── hooks/

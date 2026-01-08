@@ -28,16 +28,19 @@ fi
 MAIN_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 for ((i=1; i<=$1; i++)); do
-  result=$(claude --permission-mode acceptEdits -p "@PRD.md @progress.txt \\
-  1. Read PRD and progress file to find the next incomplete task. \\
-  2. Create a feature branch: git checkout -b feature/task-$i \\
-  3. Implement the task. \\
-  4. Run tests and linting. \\
-  5. Commit your changes with a clear conventional commit message. \\
-  6. Push the branch: git push -u origin feature/task-$i \\
-  7. Create a PR: gh pr create --title 'Task: <description>' --body '<details>' \\
-  8. Update progress.txt with task completion and PR link. \\
-  9. Switch back to main: git checkout ${MAIN_BRANCH} \\
+  result=$(claude --permission-mode acceptEdits -p "@PRD.md @progress.txt @.ai/ralph/index.md \\
+  1. Read PRD, progress, and last 3 entries from index.md. \\
+  2. Find next incomplete task. \\
+  3. Write plan to .ai/ralph/plan.md (goal, files, tests, exit criteria). \\
+  4. Create feature branch: git checkout -b feature/task-$i \\
+  5. Implement the task according to plan. \\
+  6. Run tests and linting. \\
+  7. Commit changes with clear conventional commit message. \\
+  8. Append summary to .ai/ralph/index.md (format: ## SHA — task). \\
+  9. Push branch: git push -u origin feature/task-$i \\
+  10. Create PR: gh pr create --title 'Task: <description>' --body '<details>' \\
+  11. Update progress.txt with task completion and PR link. \\
+  12. Switch back to main: git checkout ${MAIN_BRANCH} \\
   ONLY WORK ON A SINGLE TASK. \\
   If the PRD is complete, output <promise>COMPLETE</promise>.")
 

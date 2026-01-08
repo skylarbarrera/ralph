@@ -14,13 +14,16 @@ fi
 TARGET_COVERAGE=${2:-80}  # Default to 80% coverage if not specified
 
 for ((i=1; i<=$1; i++)); do
-  result=$(claude --permission-mode acceptEdits -p "\\
-  1. Run coverage analysis (e.g., jest --coverage, pytest --cov, go test -cover). \\
-  2. Find the file with the lowest coverage or most uncovered lines. \\
-  3. Write tests for uncovered code paths. \\
-  4. Run tests to verify they pass. \\
-  5. Check if coverage target of ${TARGET_COVERAGE}% is met. \\
-  6. Commit your changes with a clear message. \\
+  result=$(claude --permission-mode acceptEdits -p "@.ai/ralph/index.md \\
+  1. Read last 3 entries from index.md for context. \\
+  2. Run coverage analysis (e.g., jest --coverage, pytest --cov, go test -cover). \\
+  3. Find the file with lowest coverage or most uncovered lines. \\
+  4. Write plan to .ai/ralph/plan.md (which file, which functions, test scenarios). \\
+  5. Write tests for uncovered code paths. \\
+  6. Run tests to verify they pass. \\
+  7. Commit your changes with clear message. \\
+  8. Append summary to .ai/ralph/index.md (format: ## SHA — task). \\
+  9. Check if coverage target of ${TARGET_COVERAGE}% is met. \\
   ONLY ADD TESTS FOR ONE FILE OR FUNCTION AT A TIME. \\
   If coverage target is met, output <promise>COMPLETE</promise>.")
 
