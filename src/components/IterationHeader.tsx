@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Text } from 'ink';
+import { ELEMENT_COLORS } from '../lib/colors.js';
 
 export interface IterationHeaderProps {
   current: number;
@@ -28,10 +29,10 @@ export function IterationHeader({ current, total, elapsedSeconds }: IterationHea
 
   return (
     <Box>
-      <Text color="cyan">┌─ </Text>
-      <Text bold color="white">{label}</Text>
-      <Text color="cyan"> {dashes} </Text>
-      <Text dimColor>{elapsed}</Text>
+      <Text color={ELEMENT_COLORS.border}>┌─ </Text>
+      <Text bold color={ELEMENT_COLORS.text}>{label}</Text>
+      <Text color={ELEMENT_COLORS.border}> {dashes} </Text>
+      <Text color={ELEMENT_COLORS.muted}>{elapsed}</Text>
     </Box>
   );
 }

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { IterationHeader, formatElapsedTime } from '../src/components/IterationHeader.js';
+import { ELEMENT_COLORS } from '../src/lib/colors.js';
 
 describe('formatElapsedTime', () => {
   it('formats seconds only', () => {
@@ -104,5 +105,11 @@ describe('IterationHeader', () => {
     );
     const output = lastFrame();
     expect(output).toContain('Iteration 0/0');
+  });
+
+  it('uses ELEMENT_COLORS for styling', () => {
+    expect(ELEMENT_COLORS.border).toBe('cyan');
+    expect(ELEMENT_COLORS.text).toBe('white');
+    expect(ELEMENT_COLORS.muted).toBe('gray');
   });
 });
