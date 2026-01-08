@@ -76,15 +76,15 @@ Enhance Ralph CLI with Claude Code-style activity feed, better pending states, a
 - [x] Update `src/components/StatusBar.tsx` - show commit info, Claude Code colors
 
 ### Integration
-- [ ] Update `src/App.tsx` - replace `<ToolList>` with `<ActivityFeed>`
-- [ ] Add `<PhaseIndicator>` to App layout
-- [ ] Show commit summary in iteration results
+- [x] Update `src/App.tsx` - replace `<ToolList>` with `<ActivityFeed>`
+- [x] Add `<PhaseIndicator>` to App layout
+- [x] Show commit summary in iteration results
 
 ### Testing
-- [ ] Add tests for `parseGitCommitOutput()` in `tests/state-machine.test.ts`
+- [x] Add tests for `parseGitCommitOutput()` in `tests/state-machine.test.ts`
 - [x] Add tests for activity log updates
-- [ ] Create `tests/ActivityFeed.test.tsx` - test activity type rendering
-- [ ] Create `tests/usePulse.test.ts` - test animation hook
+- [x] Create `tests/ActivityFeed.test.tsx` - test activity type rendering
+- [x] Create `tests/usePulse.test.ts` - test animation hook
 - [x] Verify existing tests still pass
 
 ## Activity Verbs

@@ -249,3 +249,15 @@
   - Tests: 455 passing (10 new tests for commit display and color integration)
   - Commit: b5187f5 feat(ui): add commit info display and ELEMENT_COLORS to StatusBar
 
+✅ 2026-01-08: Integrated activity components into App (Integration)
+  - Replaced ToolList with ActivityFeed in App.tsx
+  - Added PhaseIndicator component below TaskTitle for real-time phase display
+  - Added isPending prop to TaskTitle for pulsing pending state
+  - Added lastCommit to IterationResult interface for commit tracking
+  - Updated IterationRunner to show commit info in per-iteration results
+  - Passed lastCommit to StatusBar for commit display
+  - Updated App.test.tsx with new activity feed and phase indicator tests
+  - Added tests for lastCommit in callback and iteration results display
+  - Tests: 464 passing (9 new tests for integration)
+  - Commit: pending
+

@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Text, useApp } from 'ink';
 import { IterationHeader } from './components/IterationHeader.js';
 import { TaskTitle } from './components/TaskTitle.js';
-import { ToolList } from './components/ToolList.js';
+import { ActivityFeed } from './components/ActivityFeed.js';
+import { PhaseIndicator } from './components/PhaseIndicator.js';
 import { StatusBar } from './components/StatusBar.js';
 import { useClaudeStream, type UseClaudeStreamOptions, type ClaudeStreamState } from './hooks/useClaudeStream.js';
 import type { Stats } from './lib/state-machine.js';
+import type { LastCommit } from './lib/types.js';
 
 export interface IterationResult {
   iteration: number;
@@ -13,6 +15,7 @@ export interface IterationResult {
   stats: Stats;
   error: Error | null;
   taskText: string | null;
+  lastCommit: LastCommit | null;
 }
 
 export interface AppProps {
@@ -58,9 +61,12 @@ export function App({
         stats: state.stats,
         error: state.error,
         taskText: state.taskText,
+        lastCommit: state.lastCommit,
       });
     }
-  }, [state.phase, state.isRunning, iteration, state.elapsedMs, state.stats, state.error, state.taskText, onIterationComplete]);
+  }, [state.phase, state.isRunning, iteration, state.elapsedMs, state.stats, state.error, state.taskText, state.lastCommit, onIterationComplete]);
+
+  const isPending = state.phase === 'idle' || !state.taskText;
 
   return (
     <Box flexDirection="column">
@@ -69,11 +75,9 @@ export function App({
         total={totalIterations}
         elapsedSeconds={elapsedSeconds}
       />
-      <TaskTitle text={state.taskText ?? undefined} />
-      <Box>
-        <Text color="cyan">│</Text>
-      </Box>
-      <ToolList toolGroups={state.toolGroups} activeTools={state.activeTools} />
+      <TaskTitle text={state.taskText ?? undefined} isPending={isPending} />
+      <PhaseIndicator phase={state.phase} />
+      <ActivityFeed activityLog={state.activityLog} />
       {state.error && (
         <Box>
           <Text color="cyan">│ </Text>
@@ -83,7 +87,7 @@ export function App({
       <Box>
         <Text color="cyan">│</Text>
       </Box>
-      <StatusBar phase={state.phase} elapsedSeconds={elapsedSeconds} />
+      <StatusBar phase={state.phase} elapsedSeconds={elapsedSeconds} lastCommit={state.lastCommit ?? undefined} />
     </Box>
   );
 }
@@ -227,15 +231,24 @@ export function IterationRunner({
           <Text color="cyan">╚═══════════════════════════════════════════════════════╝</Text>
         </Box>
         {results.map((result, idx) => (
-          <Box key={idx}>
-            <Text color={result.error ? 'red' : 'green'}>
-              {result.error ? '✗' : '✓'}
-            </Text>
-            <Text> Iteration {result.iteration}: </Text>
-            <Text color="gray">
-              {result.taskText ? result.taskText.slice(0, 40) + (result.taskText.length > 40 ? '...' : '') : 'No task'}
-            </Text>
-            <Text color="gray"> ({formatDuration(result.durationMs)})</Text>
+          <Box key={idx} flexDirection="column">
+            <Box>
+              <Text color={result.error ? 'red' : 'green'}>
+                {result.error ? '✗' : '✓'}
+              </Text>
+              <Text> Iteration {result.iteration}: </Text>
+              <Text color="gray">
+                {result.taskText ? result.taskText.slice(0, 40) + (result.taskText.length > 40 ? '...' : '') : 'No task'}
+              </Text>
+              <Text color="gray"> ({formatDuration(result.durationMs)})</Text>
+            </Box>
+            {result.lastCommit && (
+              <Box marginLeft={2}>
+                <Text color="green">✓ </Text>
+                <Text color="yellow">{result.lastCommit.hash.slice(0, 7)}</Text>
+                <Text color="gray"> - {result.lastCommit.message.slice(0, 50)}{result.lastCommit.message.length > 50 ? '...' : ''}</Text>
+              </Box>
+            )}
           </Box>
         ))}
       </Box>

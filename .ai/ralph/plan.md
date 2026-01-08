@@ -1,20 +1,19 @@
 ## Goal
-Add pulse effect to TaskTitle component for pending state indication.
+Integrate new activity components into App.tsx: replace ToolList with ActivityFeed, add PhaseIndicator, show commit in results.
 
 ## Files
-- src/components/TaskTitle.tsx - add isPending prop and usePulse integration
-- tests/TaskTitle.test.tsx - add tests for pending state and pulse effect
+- src/App.tsx - replace ToolList with ActivityFeed, add PhaseIndicator, pass commit to iteration results
+- tests/App.test.tsx - update tests for new components
 
 ## Tests
-- TaskTitle shows play icon with normal color when not pending
-- TaskTitle shows pulsing effect when isPending=true (color alternates)
-- TaskTitle uses ELEMENT_COLORS for consistent styling
-- Pulse effect is disabled when isPending=false
+- ActivityFeed renders in place of ToolList
+- PhaseIndicator displays correct phase
+- Commit info passed to onIterationComplete callback
+- All existing tests updated and passing
 
 ## Exit Criteria
-- TaskTitle has isPending prop that enables pulse animation
-- Uses usePulse hook for animation
-- Uses ELEMENT_COLORS from colors module
-- All existing tests still pass
-- New tests for pending state pass
+- App uses ActivityFeed instead of ToolList
+- PhaseIndicator visible in App layout
+- Commit summary included in iteration results
+- All tests pass
 - Changes committed

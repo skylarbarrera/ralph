@@ -3,7 +3,8 @@ import React from 'react';
 import { render } from 'ink-testing-library';
 import { App, IterationRunner, type IterationResult } from '../src/App.js';
 import type { ClaudeStreamState } from '../src/hooks/useClaudeStream.js';
-import type { ToolGroup, ActiveTool, Stats } from '../src/lib/state-machine.js';
+import type { Stats } from '../src/lib/state-machine.js';
+import type { ActivityItem, LastCommit } from '../src/lib/types.js';
 
 vi.mock('../src/hooks/useClaudeStream.js', () => ({
   useClaudeStream: () => ({
@@ -24,6 +25,8 @@ vi.mock('../src/hooks/useClaudeStream.js', () => ({
     result: null,
     error: null,
     isRunning: false,
+    activityLog: [],
+    lastCommit: null,
   }),
 }));
 
@@ -156,91 +159,97 @@ describe('App', () => {
     });
   });
 
-  describe('tool groups display', () => {
-    it('renders completed tool groups', () => {
-      const toolGroups: ToolGroup[] = [
-        {
-          category: 'read',
-          tools: [
-            { id: '1', name: 'Read', category: 'read', durationMs: 800, isError: false, input: { file_path: '/test.ts' } },
-          ],
-          totalDurationMs: 800,
-        },
+  describe('activity feed display', () => {
+    it('renders thought items', () => {
+      const activityLog: ActivityItem[] = [
+        { type: 'thought', timestamp: Date.now(), text: 'Analyzing the codebase' },
       ];
-      const state = createMockState({ toolGroups, phase: 'thinking' });
+      const state = createMockState({ activityLog, phase: 'thinking' });
+      const { lastFrame } = render(<App prompt="test" _mockState={state} />);
+      const output = lastFrame();
+      expect(output).toContain('●');
+      expect(output).toContain('Analyzing the codebase');
+    });
+
+    it('renders tool_start items', () => {
+      const activityLog: ActivityItem[] = [
+        { type: 'tool_start', timestamp: Date.now(), toolUseId: '1', toolName: 'Read', displayName: 'Reading auth.ts' },
+      ];
+      const state = createMockState({ activityLog, phase: 'reading' });
+      const { lastFrame } = render(<App prompt="test" _mockState={state} />);
+      const output = lastFrame();
+      expect(output).toContain('Reading auth.ts');
+    });
+
+    it('renders tool_complete items with duration', () => {
+      const activityLog: ActivityItem[] = [
+        { type: 'tool_complete', timestamp: Date.now(), toolUseId: '1', toolName: 'Read', displayName: 'Read test.ts', durationMs: 800, isError: false },
+      ];
+      const state = createMockState({ activityLog, phase: 'thinking' });
       const { lastFrame } = render(<App prompt="test" _mockState={state} />);
       const output = lastFrame();
       expect(output).toContain('✓');
-      expect(output).toContain('Reading');
-      expect(output).toContain('(0.8s)');
+      expect(output).toContain('Read test.ts');
+      expect(output).toContain('0.8s');
     });
 
-    it('renders multiple completed groups', () => {
-      const toolGroups: ToolGroup[] = [
-        {
-          category: 'read',
-          tools: [
-            { id: '1', name: 'Read', category: 'read', durationMs: 800, isError: false, input: {} },
-            { id: '2', name: 'Read', category: 'read', durationMs: 400, isError: false, input: {} },
-          ],
-          totalDurationMs: 1200,
-        },
-        {
-          category: 'write',
-          tools: [
-            { id: '3', name: 'Edit', category: 'write', durationMs: 600, isError: false, input: { file_path: '/x.ts' } },
-          ],
-          totalDurationMs: 600,
-        },
+    it('renders commit items', () => {
+      const activityLog: ActivityItem[] = [
+        { type: 'commit', timestamp: Date.now(), hash: 'abc1234567890', message: 'feat: add new feature' },
       ];
-      const state = createMockState({ toolGroups, phase: 'thinking' });
+      const state = createMockState({ activityLog, phase: 'thinking' });
       const { lastFrame } = render(<App prompt="test" _mockState={state} />);
       const output = lastFrame();
-      expect(output).toContain('Reading 2 files');
-      expect(output).toContain('Editing');
+      expect(output).toContain('abc1234');
+      expect(output).toContain('feat: add new feature');
+    });
+
+    it('renders multiple activity items', () => {
+      const activityLog: ActivityItem[] = [
+        { type: 'thought', timestamp: Date.now(), text: 'Starting implementation' },
+        { type: 'tool_complete', timestamp: Date.now(), toolUseId: '1', toolName: 'Read', displayName: 'Read file.ts', durationMs: 500, isError: false },
+        { type: 'tool_start', timestamp: Date.now(), toolUseId: '2', toolName: 'Edit', displayName: 'Editing file.ts' },
+      ];
+      const state = createMockState({ activityLog, phase: 'editing' });
+      const { lastFrame } = render(<App prompt="test" _mockState={state} />);
+      const output = lastFrame();
+      expect(output).toContain('Starting implementation');
+      expect(output).toContain('Read file.ts');
+      expect(output).toContain('Editing file.ts');
     });
   });
 
-  describe('active tools display', () => {
-    it('renders active tools with spinner', () => {
-      const activeTools: ActiveTool[] = [
-        {
-          id: '1',
-          name: 'Read',
-          category: 'read',
-          startTime: Date.now(),
-          input: { file_path: '/src/auth.ts' },
-        },
-      ];
-      const state = createMockState({ activeTools, phase: 'reading' });
+  describe('phase indicator display', () => {
+    it('renders phase indicator for idle', () => {
+      const state = createMockState({ phase: 'idle' });
       const { lastFrame } = render(<App prompt="test" _mockState={state} />);
       const output = lastFrame();
-      expect(output).toContain('Reading');
-      expect(output).toContain('auth.ts');
+      expect(output).toContain('○');
+      expect(output).toContain('Waiting');
     });
 
-    it('renders multiple active tools', () => {
-      const activeTools: ActiveTool[] = [
-        {
-          id: '1',
-          name: 'Read',
-          category: 'read',
-          startTime: Date.now(),
-          input: { file_path: '/a.ts' },
-        },
-        {
-          id: '2',
-          name: 'Read',
-          category: 'read',
-          startTime: Date.now(),
-          input: { file_path: '/b.ts' },
-        },
-      ];
-      const state = createMockState({ activeTools, phase: 'reading' });
+    it('renders phase indicator for reading', () => {
+      const state = createMockState({ phase: 'reading' });
       const { lastFrame } = render(<App prompt="test" _mockState={state} />);
       const output = lastFrame();
-      expect(output).toContain('a.ts');
-      expect(output).toContain('b.ts');
+      expect(output).toContain('◐');
+      expect(output).toContain('Reading');
+    });
+
+    it('renders phase indicator for editing', () => {
+      const state = createMockState({ phase: 'editing' });
+      const { lastFrame } = render(<App prompt="test" _mockState={state} />);
+      const output = lastFrame();
+      expect(output).toContain('✎');
+      expect(output).toContain('Editing');
+    });
+
+    it('renders phase indicator for done', () => {
+      const state = createMockState({ phase: 'done' });
+      const { lastFrame } = render(<App prompt="test" _mockState={state} />);
+      const output = lastFrame();
+      expect(output).toContain('✓');
+      expect(output).toContain('Done');
     });
   });
 
@@ -265,30 +274,16 @@ describe('App', () => {
   });
 
   describe('mixed state', () => {
-    it('renders full iteration with completed groups and active tools', () => {
-      const toolGroups: ToolGroup[] = [
-        {
-          category: 'read',
-          tools: [
-            { id: '1', name: 'Read', category: 'read', durationMs: 500, isError: false, input: {} },
-            { id: '2', name: 'Glob', category: 'read', durationMs: 300, isError: false, input: {} },
-          ],
-          totalDurationMs: 800,
-        },
-      ];
-      const activeTools: ActiveTool[] = [
-        {
-          id: '3',
-          name: 'Edit',
-          category: 'write',
-          startTime: Date.now(),
-          input: { file_path: '/src/index.ts' },
-        },
+    it('renders full iteration with activity log and phase indicator', () => {
+      const activityLog: ActivityItem[] = [
+        { type: 'thought', timestamp: Date.now() - 2000, text: 'Analyzing project structure' },
+        { type: 'tool_complete', timestamp: Date.now() - 1500, toolUseId: '1', toolName: 'Read', displayName: 'Read package.json', durationMs: 500, isError: false },
+        { type: 'tool_complete', timestamp: Date.now() - 1000, toolUseId: '2', toolName: 'Glob', displayName: 'Found 5 files', durationMs: 300, isError: false },
+        { type: 'tool_start', timestamp: Date.now(), toolUseId: '3', toolName: 'Edit', displayName: 'Editing index.ts' },
       ];
       const state = createMockState({
         taskText: 'Adding authentication middleware',
-        toolGroups,
-        activeTools,
+        activityLog,
         phase: 'editing',
         elapsedMs: 42000,
       });
@@ -300,10 +295,10 @@ describe('App', () => {
 
       expect(output).toContain('Iteration 2/10');
       expect(output).toContain('Adding authentication middleware');
-      expect(output).toContain('Reading 2 files');
-      expect(output).toContain('Editing');
-      expect(output).toContain('index.ts');
-      expect(output).toContain('Editing...');
+      expect(output).toContain('Analyzing project structure');
+      expect(output).toContain('Read package.json');
+      expect(output).toContain('Editing index.ts');
+      expect(output).toContain('✎');
     });
   });
 
@@ -348,6 +343,38 @@ describe('App', () => {
           stats: expect.any(Object),
           error: null,
           taskText: 'Test task',
+          lastCommit: null,
+        });
+      });
+    });
+
+    it('includes lastCommit in callback when present', async () => {
+      const onComplete = vi.fn();
+      const lastCommit: LastCommit = { hash: 'abc1234567890', message: 'feat: add feature' };
+      const state = createMockState({
+        phase: 'done',
+        isRunning: false,
+        elapsedMs: 5000,
+        taskText: 'Test task',
+        lastCommit,
+      });
+      render(
+        <App
+          prompt="test"
+          iteration={1}
+          totalIterations={3}
+          _mockState={state}
+          onIterationComplete={onComplete}
+        />
+      );
+      await vi.waitFor(() => {
+        expect(onComplete).toHaveBeenCalledWith({
+          iteration: 1,
+          durationMs: 5000,
+          stats: expect.any(Object),
+          error: null,
+          taskText: 'Test task',
+          lastCommit: { hash: 'abc1234567890', message: 'feat: add feature' },
         });
       });
     });
@@ -390,6 +417,7 @@ function createMockResult(overrides: Partial<IterationResult> = {}): IterationRe
     stats: createMockStats(),
     error: null,
     taskText: 'Test task',
+    lastCommit: null,
     ...overrides,
   };
 }
@@ -561,6 +589,66 @@ describe('IterationRunner', () => {
       const output = lastFrame();
       expect(output).toContain('✓');
       expect(output).toContain('✗');
+    });
+
+    it('shows commit info for iterations with commits', () => {
+      const results: IterationResult[] = [
+        createMockResult({
+          iteration: 1,
+          lastCommit: { hash: 'abc1234567890', message: 'feat: add new feature' },
+        }),
+      ];
+      const { lastFrame } = render(
+        <IterationRunner
+          prompt="test"
+          totalIterations={1}
+          _mockResults={results}
+          _mockIsComplete={true}
+        />
+      );
+      const output = lastFrame();
+      expect(output).toContain('abc1234');
+      expect(output).toContain('feat: add new feature');
+    });
+
+    it('truncates long commit messages', () => {
+      const longMessage = 'feat: this is a very long commit message that should be truncated for display in the summary';
+      const results: IterationResult[] = [
+        createMockResult({
+          iteration: 1,
+          lastCommit: { hash: 'abc1234567890', message: longMessage },
+        }),
+      ];
+      const { lastFrame } = render(
+        <IterationRunner
+          prompt="test"
+          totalIterations={1}
+          _mockResults={results}
+          _mockIsComplete={true}
+        />
+      );
+      const output = lastFrame();
+      expect(output).toContain('abc1234');
+      expect(output).toContain('...');
+      expect(output).not.toContain(longMessage);
+    });
+
+    it('does not show commit info when no commit', () => {
+      const results: IterationResult[] = [
+        createMockResult({ iteration: 1, lastCommit: null }),
+      ];
+      const { lastFrame } = render(
+        <IterationRunner
+          prompt="test"
+          totalIterations={1}
+          _mockResults={results}
+          _mockIsComplete={true}
+        />
+      );
+      const output = lastFrame();
+      expect(output).toContain('Iteration 1');
+      const commitCount = (output?.match(/abc1234/g) || []).length;
+      expect(commitCount).toBe(0);
     });
   });
 
