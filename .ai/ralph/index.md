@@ -62,3 +62,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 19 passing
 - notes: Coalesced tool list; shows completed groups with count/duration, active tools with spinners
 - next: Create StatusBar.tsx component
+
+## cfc6f79 — Add StatusBar Ink component
+- files: src/components/StatusBar.tsx, tests/StatusBar.test.tsx
+- tests: 20 passing
+- notes: Bottom status bar with phase and elapsed time; supports custom summary; matches header style
+- next: Create useClaudeStream React hook

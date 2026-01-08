@@ -73,3 +73,12 @@
   - Tests: 19 passing
   - Commit: 7bc8921 feat(ui): add ToolList Ink component
 
+✅ 2026-01-08: Created StatusBar Ink component
+  - Created src/components/StatusBar.tsx - bottom status bar
+  - Displays phase label (Waiting..., Reading..., Editing..., Running..., Thinking..., Done)
+  - Shows elapsed time in format matching IterationHeader
+  - Supports custom summary text override
+  - Visual style matches header: `└─ Done (2:14) ───────────`
+  - Tests: 20 passing
+  - Commit: cfc6f79 feat(ui): add StatusBar Ink component
+
