@@ -112,3 +112,14 @@
   - Tests: 17 passing
   - Commit: b8fa540 feat(cli): add CLI entry point with commander
 
+✅ 2026-01-08: Implemented iteration loop and final summary
+  - Added IterationRunner component to manage sequential iteration execution
+  - Tracks iteration results with per-iteration stats (duration, tool counts, error state)
+  - Aggregates stats across all iterations for summary display
+  - Final summary shows: success/failure counts, total duration, aggregated tool stats
+  - Per-iteration results list with task descriptions, durations, success/error icons
+  - App component now calls onIterationComplete callback when done
+  - CLI updated to use IterationRunner instead of App directly
+  - Tests: 37 passing (was 22 for App.test.tsx)
+  - Commit: fda16d0 feat(app): add iteration loop and final summary display
+

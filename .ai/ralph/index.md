@@ -86,3 +86,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 17 passing
 - notes: Parses all CLI options (-n, -p, --prompt-file, --cwd, --timeout-idle, --save-jsonl, --quiet, --title); DEFAULT_PROMPT for Ralph loop; graceful shutdown
 - next: Handle iteration loop and final summary in App
+
+## fda16d0 — Add iteration loop and final summary display
+- files: src/App.tsx, src/cli.tsx, tests/App.test.tsx
+- tests: 37 passing (was 22)
+- notes: IterationRunner manages sequential iterations; aggregates stats; displays final summary with per-iteration results
+- next: Run actual claude iteration and verify output
