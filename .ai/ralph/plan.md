@@ -1,20 +1,21 @@
 ## Goal
-Create usePulse React hook for pulsing animations in the terminal UI.
+Create ActivityFeed.tsx component that renders a rolling activity feed with last N activity items.
 
 ## Files
-- src/hooks/usePulse.ts - new hook that toggles a boolean on an interval
-- tests/usePulse.test.ts - unit tests for the hook
+- src/components/ActivityFeed.tsx - main container component
+- tests/ActivityFeed.test.tsx - unit tests
 
 ## Tests
-- Returns pulse boolean that toggles on interval
-- Default interval is configurable (e.g., 500ms)
-- Cleans up interval on unmount
-- Can be started/stopped via enabled option
-- Immediate initial state (no delay before first pulse)
+- Renders nothing when activity log is empty
+- Renders thought items with bullet prefix
+- Renders tool_start items with spinner
+- Renders tool_complete items with checkmark/error icon
+- Renders commit items with success icon and hash
+- Limits display to maxItems prop (default 20)
+- Shows most recent items when log exceeds maxItems
 
 ## Exit Criteria
-- Hook works with default interval
-- Hook accepts custom interval
-- Hook accepts enabled flag to pause/resume
-- Tests pass with 100% coverage
+- ActivityFeed renders all activity types correctly
+- Tests pass with good coverage
+- No linting errors
 - Changes committed
