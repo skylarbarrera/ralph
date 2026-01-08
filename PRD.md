@@ -64,7 +64,7 @@ Enhance Ralph CLI with Claude Code-style activity feed, better pending states, a
 - [x] Create `src/hooks/usePulse.ts` hook for pulsing animations (toggle boolean on interval)
 
 ### New Components - Activity Feed
-- [ ] Create `src/components/ActivityFeed.tsx` - main container, renders last N items
+- [x] Create `src/components/ActivityFeed.tsx` - main container, renders last N items
 - [ ] Create `src/components/ThoughtItem.tsx` - displays `│ ● {thought text}`
 - [ ] Create `src/components/ToolActivityItem.tsx` - shows `│   ✓ Created src/auth.ts` or `│   ⠋ Editing...`
 - [ ] Create `src/components/CommitItem.tsx` - displays `│ ✓ a1b2c3d - commit message`

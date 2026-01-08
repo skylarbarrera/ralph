@@ -181,3 +181,14 @@
   - Tests: 341 passing (15 new tests for usePulse hook)
   - Commit: 3f17c24 feat(hooks): add usePulse hook for pulsing animations
 
+✅ 2026-01-08: Created ActivityFeed component (New Components - Activity Feed)
+  - Created src/components/ActivityFeed.tsx as main container for rolling activity feed
+  - Renders thought items with bullet prefix (● symbol)
+  - Shows tool_start items with animated spinner
+  - Displays tool_complete with checkmark/error icon and duration
+  - Shows commit items with short hash (7 chars) and message
+  - Limits display to maxItems (default 20) showing most recent items
+  - Uses colors module for consistent Claude Code styling
+  - Tests: 356 passing (15 new tests for ActivityFeed)
+  - Commit: ad5951d feat(ui): add ActivityFeed component for rolling activity display
+

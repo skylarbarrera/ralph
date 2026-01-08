@@ -128,3 +128,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 341 passing (15 new)
 - notes: Toggle boolean on configurable interval; supports enabled option; cleans up on unmount
 - next: Create ActivityFeed component for rolling activity display
+
+## ad5951d — Add ActivityFeed component for rolling activity display
+- files: src/components/ActivityFeed.tsx, tests/ActivityFeed.test.tsx
+- tests: 356 passing (15 new)
+- notes: Renders thoughts (●), tool_start (spinner), tool_complete (✓/✗), commits; maxItems limits display to recent N items
+- next: Create ThoughtItem, ToolActivityItem, CommitItem components
