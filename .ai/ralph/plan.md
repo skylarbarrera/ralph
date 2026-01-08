@@ -1,21 +1,27 @@
 ## Goal
-Create the main App.tsx Ink component that composes all UI components and manages iteration state.
+Create the CLI entry point (src/cli.tsx) using commander for argument parsing and Ink for rendering.
 
 ## Files
-- src/App.tsx - Main Ink component composing IterationHeader, TaskTitle, ToolList, StatusBar
-- tests/App.test.tsx - Unit tests for App component
+- src/cli.tsx - CLI entry point with commander options and Ink render
+- tests/cli.test.tsx - Unit tests for CLI argument parsing and rendering
 
 ## Tests
-- Renders all child components (IterationHeader, TaskTitle, ToolList, StatusBar)
-- Displays iteration progress correctly
-- Shows task text from useClaudeStream
-- Handles loading/idle state
-- Handles error state
-- Handles completion state
+- Parses -n/--iterations option (default: 1)
+- Parses -p/--prompt option
+- Parses --prompt-file option (reads from file)
+- Parses --cwd option
+- Parses --timeout-idle option (default: 120)
+- Parses --save-jsonl option
+- Parses --quiet option
+- Parses --title option
+- Default prompt contains Ralph loop instructions
+- Renders App component with correct props
+- Handles graceful shutdown on SIGINT
 
 ## Exit Criteria
-- App.tsx composes all existing components
-- Uses useClaudeStream hook for state management
-- Displays proper UI for each phase (idle, reading, editing, running, thinking, done)
-- Tests pass with good coverage
+- CLI parses all options from PRD
+- Default prompt defined for Ralph loop
+- Renders Ink App with parsed options
+- Handles Ctrl+C gracefully
+- Tests pass with 80%+ coverage
 - Changes committed
