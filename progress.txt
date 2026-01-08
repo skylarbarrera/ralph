@@ -192,3 +192,10 @@
   - Tests: 356 passing (15 new tests for ActivityFeed)
   - Commit: ad5951d feat(ui): add ActivityFeed component for rolling activity display
 
+✅ 2026-01-08: Extracted ThoughtItem into standalone component
+  - Created src/components/ThoughtItem.tsx with exported ThoughtItem component
+  - Displays │ ● {thought text} with correct colors from ELEMENT_COLORS
+  - Updated ActivityFeed.tsx to import ThoughtItem from new file
+  - Tests: 367 passing (11 new tests for ThoughtItem)
+  - Commit: 79f4019 feat(ui): extract ThoughtItem into standalone component
+

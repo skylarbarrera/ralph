@@ -65,7 +65,7 @@ Enhance Ralph CLI with Claude Code-style activity feed, better pending states, a
 
 ### New Components - Activity Feed
 - [x] Create `src/components/ActivityFeed.tsx` - main container, renders last N items
-- [ ] Create `src/components/ThoughtItem.tsx` - displays `│ ● {thought text}`
+- [x] Create `src/components/ThoughtItem.tsx` - displays `│ ● {thought text}`
 - [ ] Create `src/components/ToolActivityItem.tsx` - shows `│   ✓ Created src/auth.ts` or `│   ⠋ Editing...`
 - [ ] Create `src/components/CommitItem.tsx` - displays `│ ✓ a1b2c3d - commit message`
 - [ ] Create `src/components/PhaseIndicator.tsx` - pulsing phase indicator

@@ -134,3 +134,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 356 passing (15 new)
 - notes: Renders thoughts (●), tool_start (spinner), tool_complete (✓/✗), commits; maxItems limits display to recent N items
 - next: Create ThoughtItem, ToolActivityItem, CommitItem components
+
+## 79f4019 — Extract ThoughtItem into standalone component
+- files: src/components/ThoughtItem.tsx, tests/ThoughtItem.test.tsx, src/components/ActivityFeed.tsx
+- tests: 367 passing (11 new)
+- notes: Displays │ ● {thought text} with ELEMENT_COLORS; ActivityFeed now imports from ThoughtItem.tsx
+- next: Create ToolActivityItem, CommitItem, PhaseIndicator components
