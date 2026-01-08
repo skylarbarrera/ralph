@@ -44,3 +44,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 13 passing
 - notes: First UI component; displays `┌─ Iteration 1/10 ──── 0:42 elapsed`; formatElapsedTime helper
 - next: Create TaskTitle.tsx component
+
+## 95171c4 — Add TaskTitle Ink component
+- files: src/components/TaskTitle.tsx, tests/TaskTitle.test.tsx
+- tests: 16 passing
+- notes: Displays `│ ▶ "First assistant text..."` with truncation support
+- next: Create ToolItem.tsx component

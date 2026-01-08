@@ -47,3 +47,11 @@
   - Tests: 13 passing
   - Commit: 3397c6f feat(ui): add IterationHeader Ink component
 
+✅ 2026-01-08: Created TaskTitle Ink component
+  - Created src/components/TaskTitle.tsx - displays task description
+  - Shows first assistant text with play icon: `│ ▶ "Implementing JWT..."`
+  - truncateText helper with configurable maxLength (default 60)
+  - Handles empty/undefined text gracefully
+  - Tests: 16 passing
+  - Commit: 95171c4 feat(ui): add TaskTitle Ink component
+
