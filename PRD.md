@@ -50,9 +50,9 @@ Build a TypeScript CLI that wraps `claude` to provide Claude Code-style terminal
 - [x] Compute elapsed time per tool and per iteration
 
 ### Core - Tool Categories
-- [ ] Create `src/lib/tool-categories.ts` - Configurable tool mapping
-- [ ] Categories: read (Read, Grep, Glob), write (Edit, Write), command (Bash), meta (TodoWrite, Task)
-- [ ] Icons: ◐ read, ✎ write, ⚡ command, ○ meta, ✓ done, ✗ error
+- [x] Create `src/lib/tool-categories.ts` - Configurable tool mapping
+- [x] Categories: read (Read, Grep, Glob), write (Edit, Write), command (Bash), meta (TodoWrite, Task)
+- [x] Icons: ◐ read, ✎ write, ⚡ command, ○ meta, ✓ done, ✗ error
 
 ### Core - JSONL Logger
 - [ ] Create `src/lib/logger.ts` - Tee raw JSONL to disk

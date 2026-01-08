@@ -26,3 +26,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 41 passing (97% coverage)
 - notes: Tracks phases, tool categories, coalesces tool groups, generates display summaries
 - next: Create tool-categories.ts for configurable tool mapping
+
+## 802598d — Add tool-categories module for configurable tool mapping
+- files: src/lib/tool-categories.ts, tests/tool-categories.test.ts, src/lib/state-machine.ts
+- tests: 30 passing (100% coverage)
+- notes: Icons (◐✎⚡○✓✗), verbs, display helpers; refactored state-machine to use module
+- next: Create JSONL logger for raw output tee to disk

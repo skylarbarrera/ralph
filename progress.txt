@@ -22,3 +22,11 @@
   - Tests: 41 passing (97% coverage)
   - Commit: 39c2e45 feat(state): add state machine for iteration tracking
 
+✅ 2026-01-08: Added tool-categories module for configurable tool mapping
+  - Created src/lib/tool-categories.ts with ToolCategory type and mappings
+  - Icons: ◐ read, ✎ write, ⚡ command, ○ meta, ✓ done, ✗ error
+  - Exports: TOOL_CATEGORIES, getToolCategory, getToolIcon, getCategoryVerb, getToolDisplayName
+  - Refactored state-machine.ts to import from tool-categories.ts (removed duplication)
+  - Tests: 30 passing (100% coverage)
+  - Commit: 802598d feat(tools): add tool-categories module for configurable tool mapping
+
