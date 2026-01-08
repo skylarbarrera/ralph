@@ -67,11 +67,11 @@ Build a TypeScript CLI that wraps `claude` to provide Claude Code-style terminal
 - [x] Create `src/components/StatusBar.tsx` - Bottom status with phase
 
 ### React Hook
-- [ ] Create `src/hooks/useClaudeStream.ts` - Custom hook for claude process
-- [ ] Spawn claude with `--dangerously-skip-permissions --output-format stream-json -p`
-- [ ] Parse JSONL stream, update state
-- [ ] Handle idle timeout (kill process if no stdout for N seconds)
-- [ ] Return: `{ tools, activeTool, phase, taskText, stats, error }`
+- [x] Create `src/hooks/useClaudeStream.ts` - Custom hook for claude process
+- [x] Spawn claude with `--dangerously-skip-permissions --output-format stream-json -p`
+- [x] Parse JSONL stream, update state
+- [x] Handle idle timeout (kill process if no stdout for N seconds)
+- [x] Return: `{ tools, activeTool, phase, taskText, stats, error }`
 
 ### Main App
 - [ ] Create `src/App.tsx` - Main Ink component

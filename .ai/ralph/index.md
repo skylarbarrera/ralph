@@ -68,3 +68,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 20 passing
 - notes: Bottom status bar with phase and elapsed time; supports custom summary; matches header style
 - next: Create useClaudeStream React hook
+
+## c225b44 — Add useClaudeStream React hook
+- files: src/hooks/useClaudeStream.ts, tests/useClaudeStream.test.tsx
+- tests: 15 passing (integration tests)
+- notes: Spawns claude, parses JSONL stream, updates state machine; handles idle timeout and cleanup
+- next: Create App.tsx main component

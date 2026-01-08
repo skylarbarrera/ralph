@@ -82,3 +82,14 @@
   - Tests: 20 passing
   - Commit: cfc6f79 feat(ui): add StatusBar Ink component
 
+✅ 2026-01-08: Created useClaudeStream React hook
+  - Created src/hooks/useClaudeStream.ts - custom hook for claude process management
+  - Spawns claude with --dangerously-skip-permissions --output-format stream-json -p
+  - Parses JSONL stream using StreamParser, updates StateMachine
+  - Returns reactive state: { phase, taskText, activeTools, toolGroups, stats, result, error, isRunning }
+  - Handles idle timeout (kills process after N seconds of no output)
+  - Cleans up process on unmount
+  - Supports JSONL logging via saveJsonl option
+  - Tests: 15 passing (integration tests for parser+machine combo)
+  - Commit: c225b44 feat(hooks): add useClaudeStream React hook
+
