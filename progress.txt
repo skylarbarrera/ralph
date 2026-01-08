@@ -159,5 +159,5 @@
   - Updated updateStateFromMachine() to sync activityLog and lastCommit from machine
   - Added 4 tests for activity log and commit tracking in hook state
   - Tests: 303 passing
-  - Commit: bbee756 feat(hooks): add activityLog and lastCommit to ClaudeStreamState
+  - Commit: 6a1e134 feat(hooks): add activityLog and lastCommit to ClaudeStreamState
 
