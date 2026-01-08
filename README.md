@@ -63,25 +63,53 @@ See the [Docker Sandboxes docs](https://docs.anthropic.com/claude/docs/docker-sa
 
 ## Quick Start
 
-1. **Clone or copy this repository** to your project directory
+### For New Projects
 
-2. **Customize the PRD** (`PRD.md`) for your project:
+**Option 1: Clone as template**
+```bash
+# Clone the repo
+git clone https://github.com/YOUR_USERNAME/ralph.git my-project
+cd my-project
+
+# Remove git history and start fresh
+rm -rf .git
+git init
+git add -A
+git commit -m "Initial commit from Ralph template"
+```
+
+**Option 2: Use as GitHub template**
+- Click "Use this template" on GitHub
+- Create your new repository
+- Clone your new repo
+
+**Option 3: Copy into existing project**
+```bash
+# From your project directory
+curl -L https://github.com/YOUR_USERNAME/ralph/archive/main.tar.gz | tar xz --strip=1
+```
+
+### Setup
+
+1. **Customize the PRD** (`PRD.md`) for your project:
    - Define clear, discrete tasks
    - Use markdown checklist format
    - Be specific about requirements
 
-3. **Run human-in-the-loop Ralph** to test:
+2. **Run human-in-the-loop Ralph** to test:
    ```bash
    ./ralph-once.sh
    ```
    Watch what it does, check the commit, run again.
 
-4. **Go autonomous** when ready:
+3. **Go autonomous** when ready:
    ```bash
    ./afk-ralph.sh 20  # Run for 20 iterations
    ```
 
-5. **Come back to working code** - check commits and progress.txt
+4. **Come back to working code** - check commits and progress.txt
+
+**Note:** Replace `YOUR_USERNAME/ralph` with the actual repo URL when published.
 
 ## Coding Standards (.claude/claude.md)
 
