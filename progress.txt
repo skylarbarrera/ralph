@@ -199,3 +199,12 @@
   - Tests: 367 passing (11 new tests for ThoughtItem)
   - Commit: 79f4019 feat(ui): extract ThoughtItem into standalone component
 
+✅ 2026-01-08: Extracted ToolActivityItem into standalone component
+  - Created src/components/ToolActivityItem.tsx with ToolStartItem and ToolCompleteItem
+  - ToolStartItem: displays spinner with displayName for in-progress tools
+  - ToolCompleteItem: displays ✓/✗ icon with displayName and duration
+  - Both use category-based colors and proper border indentation (│   )
+  - Updated ActivityFeed.tsx to import from ToolActivityItem.tsx
+  - Tests: 392 passing (25 new tests for ToolActivityItem)
+  - Commit: 8e4ff09 feat(ui): extract ToolActivityItem into standalone component
+
