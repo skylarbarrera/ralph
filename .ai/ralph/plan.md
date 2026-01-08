@@ -1,18 +1,19 @@
 ## Goal
-Create the IterationHeader Ink component that displays iteration progress with elapsed time.
+Create TaskTitle Ink component that displays the first assistant text chunk as the task description.
 
 ## Files
-- src/components/IterationHeader.tsx - New component: `┌─ Iteration 1/10 ──── 0:42 elapsed`
-- tests/IterationHeader.test.tsx - Unit tests for rendering
+- src/components/TaskTitle.tsx - new component displaying `▶ "First assistant text chunk..."`
+- tests/TaskTitle.test.tsx - unit tests for component rendering
 
 ## Tests
-- Renders current/total iteration numbers correctly
-- Formats elapsed time correctly (seconds, minutes:seconds, hours:minutes:seconds)
-- Handles edge cases (iteration 0, large numbers)
-- Renders with proper box-drawing characters
+- Renders text with play icon (▶) and quotes
+- Truncates long text with ellipsis at configurable max length
+- Handles empty text gracefully
+- Handles undefined/null text
+- Renders proper indentation with box-drawing prefix (│)
 
 ## Exit Criteria
-- Component renders iteration header matching PRD design
-- Tests pass with 80%+ coverage
-- TypeScript compiles without errors
-- Changes committed
+- Component renders per PRD spec: `│ ▶ "Implementing JWT authentication for the API..."`
+- Text truncation works for long messages
+- Tests pass with good coverage
+- No type errors
