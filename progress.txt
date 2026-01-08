@@ -2,3 +2,23 @@
 # Ralph appends completed tasks here after each iteration.
 # This file helps Ralph understand what's been done and what's next.
 
+✅ 2026-01-08: Implemented JSONL stream parser
+  - Created src/lib/types.ts with TypeScript types for Claude messages and events
+  - Created src/lib/stream-parser.ts with EventEmitter-based parser
+  - Handles system, assistant, user, result envelope types
+  - Emits init, tool_start, tool_end, text, result events
+  - Correlates tool_use.id with tool_result.tool_use_id
+  - Supports chunk-based parsing with buffering
+  - Tests: 25 passing (95% coverage)
+  - Commit: ca9595d feat(parser): add JSONL stream parser for Claude output
+
+✅ 2026-01-08: Implemented state machine for iteration tracking
+  - Created src/lib/state-machine.ts with StateMachine class
+  - Tracks phases: idle, reading, editing, running, thinking, done
+  - Categorizes tools: read (Read/Grep/Glob), write (Edit/Write), command (Bash), meta (TodoWrite/Task)
+  - Coalesces consecutive tools of same category into groups
+  - Generates display summaries (e.g., "Reading file.ts", "Editing 3 items")
+  - Tracks stats: toolsStarted, toolsCompleted, toolsErrored, reads, writes, commands, metaOps
+  - Tests: 41 passing (97% coverage)
+  - Commit: 39c2e45 feat(state): add state machine for iteration tracking
+

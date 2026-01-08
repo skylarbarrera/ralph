@@ -14,3 +14,15 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 ---
 
 <!-- Entries append below this line -->
+
+## ca9595d — Add JSONL stream parser for Claude output
+- files: src/lib/types.ts, src/lib/stream-parser.ts, tests/stream-parser.test.ts
+- tests: 25 passing (95% coverage)
+- notes: EventEmitter-based parser handles all envelope types, correlates tool_use/tool_result
+- next: Create state machine to track iteration state
+
+## 39c2e45 — Add state machine for iteration tracking
+- files: src/lib/state-machine.ts, tests/state-machine.test.ts
+- tests: 41 passing (97% coverage)
+- notes: Tracks phases, tool categories, coalesces tool groups, generates display summaries
+- next: Create tool-categories.ts for configurable tool mapping
