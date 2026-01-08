@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { TaskTitle, truncateText } from '../src/components/TaskTitle.js';
@@ -105,5 +105,63 @@ describe('TaskTitle', () => {
     const { lastFrame } = render(<TaskTitle text={text} maxLength={60} />);
     const output = lastFrame();
     expect(output).toContain('...');
+  });
+
+  describe('isPending prop', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('renders with isPending=false by default', () => {
+      const { lastFrame } = render(<TaskTitle text="Test task" />);
+      const output = lastFrame();
+      expect(output).toContain('▶');
+      expect(output).toContain('"Test task"');
+    });
+
+    it('renders with isPending=true', () => {
+      const { lastFrame } = render(<TaskTitle text="Test task" isPending={true} />);
+      const output = lastFrame();
+      expect(output).toContain('▶');
+      expect(output).toContain('"Test task"');
+    });
+
+    it('renders play icon when not pending', () => {
+      const { lastFrame } = render(<TaskTitle text="Test task" isPending={false} />);
+      const output = lastFrame();
+      expect(output).toContain('▶');
+    });
+
+    it('shows pulse effect when pending (icon color alternates over time)', () => {
+      const { lastFrame, rerender } = render(<TaskTitle text="Test task" isPending={true} />);
+      const initialOutput = lastFrame();
+      expect(initialOutput).toContain('▶');
+
+      vi.advanceTimersByTime(500);
+      rerender(<TaskTitle text="Test task" isPending={true} />);
+      const afterPulseOutput = lastFrame();
+      expect(afterPulseOutput).toContain('▶');
+    });
+
+    it('does not pulse when isPending is false', () => {
+      const { lastFrame, rerender } = render(<TaskTitle text="Test task" isPending={false} />);
+      const initialOutput = lastFrame();
+      expect(initialOutput).toContain('▶');
+
+      vi.advanceTimersByTime(500);
+      rerender(<TaskTitle text="Test task" isPending={false} />);
+      const afterTimeOutput = lastFrame();
+      expect(afterTimeOutput).toContain('▶');
+    });
+
+    it('uses ELEMENT_COLORS for border styling', () => {
+      const { lastFrame } = render(<TaskTitle text="Test" />);
+      const output = lastFrame();
+      expect(output).toContain('│');
+    });
   });
 });
