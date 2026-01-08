@@ -71,7 +71,7 @@ Enhance Ralph CLI with Claude Code-style activity feed, better pending states, a
 - [x] Create `src/components/PhaseIndicator.tsx` - pulsing phase indicator
 
 ### Component Updates - Styling
-- [ ] Update `src/components/IterationHeader.tsx` - bold text, cyan borders
+- [x] Update `src/components/IterationHeader.tsx` - bold text, cyan borders
 - [ ] Update `src/components/TaskTitle.tsx` - add pulse effect for pending
 - [ ] Update `src/components/StatusBar.tsx` - show commit info, Claude Code colors
 
