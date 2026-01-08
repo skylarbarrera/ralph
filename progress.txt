@@ -133,3 +133,13 @@
   - Tests: 268 passing
   - Commit: 99f0427 fix: add --verbose flag and improve tool display
 
+✅ 2026-01-08: Added activity log and output tracking (Data Layer - Activity Tracking)
+  - Added ActivityItem type with variants: thought, tool_start, tool_complete, commit
+  - Added LastCommit interface for storing commit hash and message
+  - Added output?: string field to CompletedTool for storing tool results
+  - Added activityLog and lastCommit to IterationState
+  - Added addActivityItem() helper with cap at 50 items
+  - Updated handleText, handleToolStart, handleToolEnd to populate activity log
+  - Tests: 277 passing (9 new tests for activity log)
+  - Commit: d409c6f feat(state): add activity log and output tracking
+

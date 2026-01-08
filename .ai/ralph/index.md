@@ -97,4 +97,10 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - files: src/hooks/useClaudeStream.ts, src/lib/logger.ts, src/lib/state-machine.ts, src/lib/tool-categories.ts, src/components/ToolList.tsx, tests/
 - tests: 268 passing
 - notes: Added --verbose flag (required for stream-json); fixed logger path handling; added input to CompletedTool for display names
-- next: Project complete! All PRD tasks finished
+- next: Add activity log tracking for rolling activity feed
+
+## d409c6f — Add activity log and output tracking
+- files: src/lib/types.ts, src/lib/state-machine.ts, tests/state-machine.test.ts
+- tests: 277 passing (9 new)
+- notes: ActivityItem type (thought/tool_start/tool_complete/commit), output in CompletedTool, activityLog capped at 50 items
+- next: Add git commit parsing to detect and log commits

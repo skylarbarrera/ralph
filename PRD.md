@@ -1,113 +1,19 @@
-# Ralph Runner - Product Requirements Document
+# Ralph Runner v2 - Product Requirements Document
 
-Build a TypeScript CLI that wraps `claude` to provide Claude Code-style terminal output with real-time progress updates.
+Enhance Ralph CLI with Claude Code-style activity feed, better pending states, and improved visual styling.
 
 ## Project Goals
-- Replace `afk-ralph.sh` with a polished TypeScript CLI
-- Parse Claude's stream-json JSONL output in real-time
-- Display clean, stateful progress updates like interactive Claude Code
-- Use Ink (React for CLIs) for rich terminal UI
+- Replace grouped tool summary with rolling activity feed
+- Show Claude Code-style context (thoughts, file operations, commits)
+- Add pulsing/animated pending states
+- Display commit hash + message per iteration
+- Apply Claude Code visual style (cyan/green colors, bold accents)
 
 ## Technical Requirements
 - TypeScript with tsx runner
 - Ink 4.x for terminal UI
 - ink-spinner for animated spinners
-- commander for CLI arg parsing
-- No external runtime dependencies beyond Node.js 18+
-
-## Dependencies
-```json
-{
-  "dependencies": {
-    "ink": "^4.4.1",
-    "ink-spinner": "^5.0.0",
-    "react": "^18.2.0",
-    "commander": "^11.1.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.0",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.0"
-  }
-}
-```
-
-## Features
-
-### Core - JSONL Stream Parser
-- [x] Create `src/lib/stream-parser.ts` - Parse newline-delimited JSON from claude stdout
-- [x] Handle envelope types: `system`, `assistant`, `user`, `result`
-- [x] Extract content blocks from `message.content[]`: `tool_use`, `tool_result`, `text`
-- [x] Correlate `tool_result.tool_use_id` with `tool_use.id`
-- [x] Emit typed events: `init`, `tool_start`, `tool_end`, `text`, `result`
-- [x] Safely ignore non-JSON lines (try/catch per line)
-
-### Core - State Machine
-- [x] Create `src/lib/state-machine.ts` - Track iteration state
-- [x] Track: currentIteration, totalIterations, phase, activeTool, pendingTools, stats
-- [x] Phases: `idle`, `reading`, `editing`, `running`, `done`
-- [x] Coalesce spammy tool sequences (20 reads → "Reading 20 files...")
-- [x] Compute elapsed time per tool and per iteration
-
-### Core - Tool Categories
-- [x] Create `src/lib/tool-categories.ts` - Configurable tool mapping
-- [x] Categories: read (Read, Grep, Glob), write (Edit, Write), command (Bash), meta (TodoWrite, Task)
-- [x] Icons: ◐ read, ✎ write, ⚡ command, ○ meta, ✓ done, ✗ error
-
-### Core - JSONL Logger
-- [x] Create `src/lib/logger.ts` - Tee raw JSONL to disk
-- [x] Write to `./runs/{ISO-timestamp}.jsonl`
-- [x] Create runs directory if needed
-
-### Ink Components
-- [x] Create `src/components/IterationHeader.tsx` - `┌─ Iteration 1/10 ──── 0:42 elapsed`
-- [x] Create `src/components/TaskTitle.tsx` - `▶ "First assistant text chunk..."`
-- [x] Create `src/components/ToolItem.tsx` - Single tool with spinner/checkmark + duration
-- [x] Create `src/components/ToolList.tsx` - Coalesced list, shows active + completed tools
-- [x] Create `src/components/StatusBar.tsx` - Bottom status with phase
-
-### React Hook
-- [x] Create `src/hooks/useClaudeStream.ts` - Custom hook for claude process
-- [x] Spawn claude with `--dangerously-skip-permissions --output-format stream-json -p`
-- [x] Parse JSONL stream, update state
-- [x] Handle idle timeout (kill process if no stdout for N seconds)
-- [x] Return: `{ tools, activeTool, phase, taskText, stats, error }`
-
-### Main App
-- [x] Create `src/App.tsx` - Main Ink component
-- [x] Compose: IterationHeader, TaskTitle, ToolList, StatusBar
-- [x] Handle iteration loop (run N iterations)
-- [x] Display final summary after all iterations
-
-### CLI Entry Point
-- [x] Create `src/cli.tsx` - Entry with commander
-- [x] Options: `-n/--iterations`, `-p/--prompt`, `--prompt-file`, `--cwd`, `--timeout-idle`, `--save-jsonl`, `--quiet`, `--title`
-- [x] Default prompt: the Ralph loop instructions
-- [x] Render Ink App, handle graceful shutdown (Ctrl+C)
-
-### Build & Config
-- [x] Update `package.json` - Add deps and script: `"ralph": "tsx src/cli.tsx"`
-- [x] Update `tsconfig.json` - Add `"jsx": "react-jsx"`, `"module": "ESNext"`
-
-### Testing
-- [x] Test stream-parser with sample JSONL
-- [x] Test state-machine transitions
-- [x] Run actual claude iteration and verify output
-
-## CLI Interface
-
-```bash
-npm run ralph -- -n 5
-
-# Or with options:
-npm run ralph -- \
-  -n 10 \
-  --prompt-file ./my-prompt.txt \
-  --cwd /path/to/repo \
-  --timeout-idle 120 \
-  --save-jsonl ./debug.jsonl \
-  --quiet
-```
+- Existing dependencies (no new packages needed)
 
 ## Display Example
 
@@ -116,29 +22,100 @@ npm run ralph -- \
 │
 │ ▶ "Implementing JWT authentication for the API..."
 │
-│ ◐ Reading (PRD.md, progress.txt, index.md)
-│ ✓ Read 3 files (0.8s)
+│ ● I'll implement JWT authentication for the API.
 │
-│ ✎ Editing (src/auth.ts, src/middleware.ts)
-│ ✓ Edited 2 files (1.2s)
+│ ● Reading project files...
+│   ✓ Read PRD.md
+│   ✓ Read progress.txt
 │
-│ ⚡ Running (npm test)
-│ ✓ Command completed (4.1s)
+│ ● Creating authentication module...
+│   ✓ Created src/auth.ts
+│   ⠋ Editing src/middleware.ts
 │
-│ ✓ Committed: a1b2c3d - feat(auth): add JWT authentication
+│ ✓ a1b2c3d - feat(auth): add JWT authentication
 │
-└─ Done (2m14s) ─────────────────────────────────────
+└─ Running... (0:42) ───────────────────────────────
 ```
 
-## Edge Cases
-- Missing `result` event: Kill after idle timeout, mark as failed
-- Non-JSON lines: Silently ignore
-- Partial messages: Ignore incomplete chunks
-- Task detection: Show first text chunk trimmed, or use `--title`
+## Features
+
+### Data Layer - Activity Tracking
+- [x] Add `ActivityItem` type to `src/lib/types.ts` (thought, tool_start, tool_complete, commit)
+- [x] Add `output?: string` to `CompletedTool` interface in `src/lib/state-machine.ts`
+- [x] Add `activityLog: ActivityItem[]` to `IterationState`
+- [x] Add `lastCommit: { hash, message }` to `IterationState`
+- [x] Store tool output content in `handleToolEnd()`
+- [x] Add `addActivityItem()` helper (cap at 50 items)
+- [x] Add thoughts to activity log in `handleText()`
+
+### Data Layer - Git Commit Parsing
+- [ ] Add `isGitCommitCommand()` method to detect git commit commands
+- [ ] Add `parseGitCommitOutput()` method with regex `/^\[[\w/-]+\s+([a-f0-9]{7,40})\]\s+(.+)$/m`
+- [ ] Parse and store commit hash + message when Bash runs git commit
+- [ ] Add commit as activity item when detected
+
+### Hook Updates
+- [ ] Add `activityLog` to `ClaudeStreamState` in `src/hooks/useClaudeStream.ts`
+- [ ] Add `lastCommit` to `ClaudeStreamState`
+- [ ] Update `updateStateFromMachine()` to include new fields
+
+### New Utilities
+- [ ] Create `src/lib/colors.ts` with Claude Code color scheme (cyan, green, yellow, red, magenta)
+- [ ] Create `src/hooks/usePulse.ts` hook for pulsing animations (toggle boolean on interval)
+
+### New Components - Activity Feed
+- [ ] Create `src/components/ActivityFeed.tsx` - main container, renders last N items
+- [ ] Create `src/components/ThoughtItem.tsx` - displays `│ ● {thought text}`
+- [ ] Create `src/components/ToolActivityItem.tsx` - shows `│   ✓ Created src/auth.ts` or `│   ⠋ Editing...`
+- [ ] Create `src/components/CommitItem.tsx` - displays `│ ✓ a1b2c3d - commit message`
+- [ ] Create `src/components/PhaseIndicator.tsx` - pulsing phase indicator
+
+### Component Updates - Styling
+- [ ] Update `src/components/IterationHeader.tsx` - bold text, cyan borders
+- [ ] Update `src/components/TaskTitle.tsx` - add pulse effect for pending
+- [ ] Update `src/components/StatusBar.tsx` - show commit info, Claude Code colors
+
+### Integration
+- [ ] Update `src/App.tsx` - replace `<ToolList>` with `<ActivityFeed>`
+- [ ] Add `<PhaseIndicator>` to App layout
+- [ ] Show commit summary in iteration results
+
+### Testing
+- [ ] Add tests for `parseGitCommitOutput()` in `tests/state-machine.test.ts`
+- [x] Add tests for activity log updates
+- [ ] Create `tests/ActivityFeed.test.tsx` - test activity type rendering
+- [ ] Create `tests/usePulse.test.ts` - test animation hook
+- [x] Verify existing tests still pass
+
+## Activity Verbs
+
+| Tool | Active | Complete |
+|------|--------|----------|
+| Read | Reading | Read |
+| Edit | Editing | Edited |
+| Write | Creating | Created |
+| Bash | Running | Ran |
+| Grep | Searching | Searched |
+| Glob | Finding | Found |
+
+## Color Scheme
+
+| Element | Color |
+|---------|-------|
+| Borders | cyan |
+| Success icons | green |
+| Warnings | yellow |
+| Errors | red |
+| Read operations | cyan |
+| Write operations | yellow |
+| Commands | magenta |
+| Meta operations | gray |
 
 ## Success Criteria
-- Clean, Claude Code-like terminal output
-- Real-time progress updates as tools execute
-- Coalesced tool displays (not spammy)
-- Works reliably for 10+ iteration loops
-- JSONL logging works for debugging
+- Rolling activity feed shows operations as they happen
+- Thoughts displayed with bullet points
+- Git commits show hash + message
+- Pulsing/animated pending states work
+- Claude Code visual style applied throughout
+- All existing tests pass
+- New component tests written
