@@ -80,3 +80,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 22 passing
 - notes: Composes IterationHeader, TaskTitle, ToolList, StatusBar; uses useClaudeStream for state; _mockState prop for testing
 - next: Create cli.tsx entry point
+
+## b8fa540 — Add CLI entry point with commander
+- files: src/cli.tsx, tests/cli.test.tsx
+- tests: 17 passing
+- notes: Parses all CLI options (-n, -p, --prompt-file, --cwd, --timeout-idle, --save-jsonl, --quiet, --title); DEFAULT_PROMPT for Ralph loop; graceful shutdown
+- next: Handle iteration loop and final summary in App

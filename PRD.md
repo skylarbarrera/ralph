@@ -80,10 +80,10 @@ Build a TypeScript CLI that wraps `claude` to provide Claude Code-style terminal
 - [ ] Display final summary after all iterations
 
 ### CLI Entry Point
-- [ ] Create `src/cli.tsx` - Entry with commander
-- [ ] Options: `-n/--iterations`, `-p/--prompt`, `--prompt-file`, `--cwd`, `--timeout-idle`, `--save-jsonl`, `--quiet`, `--title`
-- [ ] Default prompt: the Ralph loop instructions
-- [ ] Render Ink App, handle graceful shutdown (Ctrl+C)
+- [x] Create `src/cli.tsx` - Entry with commander
+- [x] Options: `-n/--iterations`, `-p/--prompt`, `--prompt-file`, `--cwd`, `--timeout-idle`, `--save-jsonl`, `--quiet`, `--title`
+- [x] Default prompt: the Ralph loop instructions
+- [x] Render Ink App, handle graceful shutdown (Ctrl+C)
 
 ### Build & Config
 - [x] Update `package.json` - Add deps and script: `"ralph": "tsx src/cli.tsx"`

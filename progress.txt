@@ -102,3 +102,13 @@
   - Tests: 22 passing
   - Commit: d1d9da8 feat(ui): add App.tsx main Ink component
 
+✅ 2026-01-08: Created CLI entry point with commander
+  - Created src/cli.tsx - entry point with commander argument parsing
+  - Options: -n/--iterations, -p/--prompt, --prompt-file, --cwd, --timeout-idle, --save-jsonl, --quiet, --title
+  - DEFAULT_PROMPT contains Ralph loop instructions
+  - resolvePrompt() handles priority: direct prompt > file > default
+  - run() renders Ink App with parsed options
+  - Graceful shutdown on SIGINT/SIGTERM
+  - Tests: 17 passing
+  - Commit: b8fa540 feat(cli): add CLI entry point with commander
+
