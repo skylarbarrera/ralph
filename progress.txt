@@ -1,0 +1,4 @@
+# Progress Tracker
+# Ralph appends completed tasks here after each iteration.
+# This file helps Ralph understand what's been done and what's next.
+
