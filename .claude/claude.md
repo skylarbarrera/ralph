@@ -260,6 +260,40 @@ Before starting work in a Ralph loop:
 
 Lazy load context. SPEC has the tasks; only read progress/index if you need to verify state.
 
+### Creating SPECs (Interactive)
+
+When a user wants to create a new SPEC, **interview them** to gather requirements before writing it:
+
+1. **Ask clarifying questions** about:
+   - What they're building and the core use case
+   - Target users and how they'll interact with it
+   - Technology preferences (or recommend based on project)
+   - Must-have vs nice-to-have features
+   - Any constraints (time, dependencies, existing code)
+
+2. **Dig into details:**
+   - Edge cases and error handling needs
+   - Authentication/authorization requirements
+   - Data storage and persistence
+   - External integrations or APIs
+   - Testing expectations
+
+3. **Generate the SPEC** once you have enough context to create specific, actionable tasks.
+
+**Example interview flow:**
+```
+User: I want a CLI tool for managing dotfiles
+You: What operations should it support? (backup, restore, sync across machines?)
+User: Backup and restore, plus linking dotfiles to a git repo
+You: Should it handle conflicts when restoring? (overwrite, skip, prompt?)
+User: Prompt the user
+You: Any specific dotfiles it must support, or auto-discover from home directory?
+...
+[Generate SPEC after gathering sufficient detail]
+```
+
+**Important:** When starting a new project, replace the existing SPEC.md entirely. Each SPEC represents one project or feature set.
+
 ### Writing SPECs
 
 When generating a SPEC, optimize for **iteration efficiency**. Each checkbox = one Ralph iteration (~3 min), so structure matters.

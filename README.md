@@ -4,12 +4,13 @@ Ralph runs AI in a loop to build software. You describe what you want, Ralph bui
 
 ## What Ralph Does
 
-1. You write a **SPEC** (a list of features you want)
-2. Ralph picks the next task from your list
-3. Ralph writes code, runs tests, and commits
-4. Repeat until your project is done
+1. You describe what you want to build
+2. Claude interviews you and creates a **SPEC** (a structured task list)
+3. Ralph picks the next task from your SPEC
+4. Ralph writes code, runs tests, and commits
+5. Repeat until your project is done
 
-**Example:** You write "Build a todo app with user login" as a SPEC. Ralph implements authentication, creates the database, builds the UI, writes tests - all while you're away.
+**Example:** You tell Claude "I want a todo app with user login." Claude asks clarifying questions, then generates a detailed SPEC. Ralph implements authentication, creates the database, builds the UI, writes tests - all while you're away.
 
 ## Quick Start
 
@@ -36,9 +37,16 @@ curl -fsSL https://anthropic.com/install-claude.sh | sh
 claude  # Run once to log in
 ```
 
-### 3. Write Your SPEC
+### 3. Create Your SPEC
 
-Create a file called `SPEC.md` with what you want built:
+Tell Claude what you want to build. Claude will ask clarifying questions and generate a SPEC for you:
+
+```bash
+claude
+> I want to build a REST API for managing users with authentication
+```
+
+Claude will interview you about details (database choice, auth method, etc.) and create `SPEC.md`:
 
 ```markdown
 # My Project
@@ -50,6 +58,8 @@ Create a file called `SPEC.md` with what you want built:
 - [ ] Add authentication with JWT tokens
 - [ ] Write tests for all endpoints
 ```
+
+**Starting something new?** Replace your old SPEC. Each SPEC represents one project or feature set.
 
 ### 4. Run Ralph
 
@@ -71,37 +81,49 @@ That's it! Check your git history to see what Ralph built.
 | `ralph init` | Add Ralph to an existing project |
 | `ralph validate` | Check if project is ready |
 
-## Writing a Good SPEC
+## Creating a Good SPEC
 
-Your SPEC determines what Ralph builds. Better SPECs = better results.
+Claude will interview you to create a detailed SPEC. The more context you provide, the better the result.
 
-**Good SPEC:**
-```markdown
-- [ ] Create User model with fields: id, name, email, passwordHash
-- [ ] Build POST /register endpoint with email validation
-- [ ] Build POST /login endpoint that returns JWT token
-- [ ] Add authentication middleware that verifies JWT
-- [ ] Write tests for registration and login flows
+**What to tell Claude:**
+- What you're building and why
+- Technologies you want to use (or let Claude recommend)
+- Any constraints or preferences
+
+**Claude will ask about:**
+- Edge cases and error handling
+- Database and storage choices
+- Authentication requirements
+- Testing strategy
+
+**Example conversation:**
+```
+You: I want a blog with markdown support
+Claude: What kind of users will interact with it? Just admins, or public readers too?
+You: Admins write posts, anyone can read
+Claude: Should readers be able to comment?
+You: Yes, but comments need approval
+Claude: [generates detailed SPEC with tasks for admin auth, post CRUD,
+        markdown rendering, comment moderation, etc.]
 ```
 
-**Bad SPEC:**
-```markdown
-- [ ] Make authentication work
-- [ ] Add some tests
-```
-
-**Tips:**
+**Tips for good SPECs:**
 - Be specific about what you want
-- Break big features into smaller tasks
-- Include testing as part of tasks ("with tests")
-- One task = one focused piece of work
+- Answer Claude's questions thoroughly
+- Each task should be one focused piece of work
+- Tests are included as part of implementation
+
+**Starting a new project?** Replace your old SPEC entirely. Each SPEC is one project or feature set.
 
 ## How It Works
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                                                              │
-│   You write SPEC.md    ──►   Ralph reads it                  │
+│   You describe idea    ──►   Claude interviews you           │
+│                              Claude creates SPEC.md          │
+│                                                              │
+│   You run ralph        ──►   Ralph reads SPEC                │
 │                              Ralph picks next task           │
 │                              Ralph writes code               │
 │                              Ralph runs tests                │
