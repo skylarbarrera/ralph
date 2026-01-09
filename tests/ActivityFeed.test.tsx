@@ -225,11 +225,44 @@ describe('ActivityFeed', () => {
       const output = lastFrame();
       expect(output).toContain('●');
       expect(output).toContain('Analyzing the task');
-      expect(output).toContain('Reading SPEC.md');
       expect(output).toContain('✓');
       expect(output).toContain('Read SPEC.md');
       expect(output).toContain('abc1234');
       expect(output).toContain('Initial commit');
+    });
+
+    it('hides tool_start when tool_complete exists for same tool', () => {
+      const activities: ActivityItem[] = [
+        { type: 'tool_start', timestamp: 1000, toolUseId: '1', toolName: 'Read', displayName: 'Reading file.ts' },
+        { type: 'tool_complete', timestamp: 2000, toolUseId: '1', toolName: 'Read', displayName: 'Read file.ts', durationMs: 500, isError: false },
+      ];
+
+      const { lastFrame } = render(<ActivityFeed activityLog={activities} />);
+      const output = lastFrame() ?? '';
+      expect(output).not.toContain('Reading file.ts');
+      expect(output).toContain('Read file.ts');
+    });
+
+    it('shows tool_start when tool is still running (no complete)', () => {
+      const activities: ActivityItem[] = [
+        { type: 'tool_start', timestamp: 1000, toolUseId: '1', toolName: 'Read', displayName: 'Reading file.ts' },
+      ];
+
+      const { lastFrame } = render(<ActivityFeed activityLog={activities} />);
+      const output = lastFrame() ?? '';
+      expect(output).toContain('Reading file.ts');
+    });
+
+    it('shows multiple running tools', () => {
+      const activities: ActivityItem[] = [
+        { type: 'tool_start', timestamp: 1000, toolUseId: '1', toolName: 'Read', displayName: 'Reading a.ts' },
+        { type: 'tool_start', timestamp: 2000, toolUseId: '2', toolName: 'Read', displayName: 'Reading b.ts' },
+      ];
+
+      const { lastFrame } = render(<ActivityFeed activityLog={activities} />);
+      const output = lastFrame() ?? '';
+      expect(output).toContain('Reading a.ts');
+      expect(output).toContain('Reading b.ts');
     });
   });
 
