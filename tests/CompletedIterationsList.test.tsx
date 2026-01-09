@@ -112,6 +112,32 @@ describe('CompletedIterationsList', () => {
     });
   });
 
+  describe('token formatting', () => {
+    it('shows nothing when usage is null', () => {
+      const results = [createMockResult({ usage: null, costUsd: 0.10 })];
+      const { lastFrame } = render(<CompletedIterationsList results={results} />);
+      expect(lastFrame()).toContain('(5s, $0.10)');
+    });
+
+    it('shows raw number for small token counts', () => {
+      const results = [createMockResult({ usage: { inputTokens: 500, outputTokens: 300 } })];
+      const { lastFrame } = render(<CompletedIterationsList results={results} />);
+      expect(lastFrame()).toContain('800');
+    });
+
+    it('shows k format for thousands', () => {
+      const results = [createMockResult({ usage: { inputTokens: 10000, outputTokens: 5000 } })];
+      const { lastFrame } = render(<CompletedIterationsList results={results} />);
+      expect(lastFrame()).toContain('15k');
+    });
+
+    it('shows decimal k for non-round thousands', () => {
+      const results = [createMockResult({ usage: { inputTokens: 12500, outputTokens: 2800 } })];
+      const { lastFrame } = render(<CompletedIterationsList results={results} />);
+      expect(lastFrame()).toContain('15.3k');
+    });
+  });
+
   describe('multiple results', () => {
     it('shows all results in order', () => {
       const results = [

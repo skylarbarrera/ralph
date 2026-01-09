@@ -22,6 +22,13 @@ function formatCost(costUsd: number | null): string {
   return `$${costUsd.toFixed(2)}`;
 }
 
+function formatTokens(usage: { inputTokens: number; outputTokens: number } | null): string {
+  if (usage === null) return '';
+  const total = usage.inputTokens + usage.outputTokens;
+  if (total < 1000) return `${total}`;
+  return `${(total / 1000).toFixed(1)}k`.replace('.0k', 'k');
+}
+
 function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - 3) + '...';
@@ -48,7 +55,7 @@ export function CompletedIterationsList({ results }: CompletedIterationsListProp
               {truncateText(result.taskText ?? 'Unknown task', 45)}
             </Text>
             <Text color="gray">
-              {' '}({formatDuration(result.durationMs)}, {formatCost(result.costUsd)})
+              {' '}({formatDuration(result.durationMs)}, {formatTokens(result.usage)}{result.usage ? ', ' : ''}{formatCost(result.costUsd)})
             </Text>
           </Box>
         </Box>
