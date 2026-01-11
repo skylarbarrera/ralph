@@ -237,9 +237,6 @@ Ralph runs Claude repeatedly, which costs money:
 - Claude Code CLI (free to install, requires Anthropic account)
 - Git (for commits)
 
-## Credits
-
-Ralph was created by [Andrew Ettinger](https://twitter.com/aettinger). This implementation is based on his guide: [How to Build with Ralph](https://www.ettinger.dev/how-to-build-with-ralph).
 
 ## License
 
