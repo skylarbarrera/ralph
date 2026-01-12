@@ -1,15 +1,17 @@
 ## Goal
-Create settings.json.example template with Stop hook configuration that uses the validate-iteration.md prompt to validate Ralph iterations.
+Add "Hooks Configuration" section to templates/.claude/ralph.md documenting Stop hook setup for iteration validation.
 
 ## Files
-- templates/.claude/settings.json.example - new file with hook configuration
+- templates/.claude/ralph.md - add new section after "Error Recovery" section
 
 ## Tests
-- N/A (configuration template file)
+- No code tests needed (documentation-only change)
+- Verify section is well-structured and complete
 
 ## Exit Criteria
-- settings.json.example exists in templates/.claude/
-- Contains Stop hook with type: prompt
-- Hook references scripts/validate-iteration.md
-- Includes other common Ralph-related settings
+- New "Hooks Configuration" section exists in ralph.md
+- Documents what hooks are and why they're useful
+- Shows settings.json configuration for Stop hook
+- References scripts/validate-iteration.md
+- Explains validation criteria and JSON output format
 - Changes committed

@@ -495,6 +495,99 @@ If a task fails:
 3. Create a new task to fix the blocker
 4. If blocked on external factor, note it and move to next task
 
+### Hooks Configuration
+
+Claude Code supports hooks that execute at specific points during a conversation. Ralph uses the **Stop hook** to validate that each iteration completed successfully before allowing the next iteration to begin.
+
+**What is the Stop Hook?**
+
+The Stop hook runs when Claude Code finishes responding. For Ralph, this validates that:
+- Code changes were implemented
+- Tests passed
+- Type checks passed (if TypeScript)
+- A commit was made
+- Tracking files were updated
+
+**Setting Up the Stop Hook:**
+
+Create or update `.claude/settings.json` in your project:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/settings.json",
+  "hooks": {
+    "Stop": [
+      {
+        "type": "prompt",
+        "promptFile": "scripts/validate-iteration.md",
+        "description": "Validate Ralph iteration completion"
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npx vitest:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": []
+  }
+}
+```
+
+**The Validation Prompt:**
+
+The Stop hook uses `scripts/validate-iteration.md` which contains an LLM prompt that checks:
+
+1. **Task Implementation** - Code changes address the SPEC task
+2. **Tests Pass** - `npm test` or `npx vitest` ran successfully
+3. **Type Check Passes** - `npm run type-check` or `tsc` passed
+4. **Commit Made** - Git commit was created with proper message
+5. **Index Updated** - `.ai/ralph/index.md` has new entry
+6. **SPEC Updated** - Completed task checkbox marked `[x]`
+7. **STATE Updated** - `STATE.txt` has progress entry
+
+**Validation Output:**
+
+The validation prompt returns JSON:
+
+```json
+{
+  "valid": true,
+  "checks": {
+    "task_implemented": true,
+    "tests_passed": true,
+    "type_check_passed": true,
+    "commit_made": true,
+    "index_updated": true,
+    "spec_updated": true,
+    "state_updated": true
+  },
+  "issues": [],
+  "summary": "Iteration completed successfully: feat(auth): add JWT token refresh"
+}
+```
+
+If `valid` is `false`, the hook provides specific issues that need to be addressed before the iteration can be considered complete.
+
+**When Validation Fails:**
+
+| Issue | Action |
+|-------|--------|
+| Tests failed | Fix the failing tests before retrying |
+| No commit made | Complete the iteration by committing changes |
+| Index not updated | Append entry to `.ai/ralph/index.md` |
+| Partial implementation | Complete the remaining parts of the task |
+
+**Disabling the Hook:**
+
+To run Ralph without validation (e.g., for debugging), remove the Stop hook from settings.json or rename the file temporarily.
+
 ## Anti-Patterns to Avoid
 
 - Catch and ignore errors without logging
