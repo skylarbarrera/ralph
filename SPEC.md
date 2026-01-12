@@ -1,56 +1,72 @@
-# Ralph v3 - Claude Code Native Features Integration
+# Ralph v3.1 - Reduce Template Duplication
 
-Enhance Ralph to leverage Claude Code's native capabilities: AskUserQuestion for SPEC interviews, Task agents for parallel exploration and code review, TodoWrite for sub-task tracking, a /ralph-iterate skill, and Stop hook validation.
+Address duplication and bloat issues from v3 integration by establishing clear separation of concerns between ralph.md (coding standards) and SKILL.md (iteration protocol).
 
-## Project Goals
-- Use AskUserQuestion tool for structured SPEC creation interviews
-- Spawn Task(Explore) agents for parallel codebase understanding
-- Add automatic code review via Task agent after implementation
-- Use TodoWrite for breaking down current task into sub-tasks
-- Create /ralph-iterate skill that encapsulates the iteration protocol
-- Add LLM-based Stop hook to validate iteration completion
+## Problem Statement
+1. **ralph.md is bloated** - Contains both coding standards AND iteration protocol details (~830 lines)
+2. **Duplication** - SKILL.md and ralph.md both describe the iteration protocol
+3. **Sync burden** - Skill exists in two places (.claude/skills/ and templates/.claude/skills/)
 
-## Phase 1: Update ralph.md with Native Tool Protocols
+## Solution Architecture
 
-- [x] Add AskUserQuestion protocol to "Creating SPECs" section in templates/.claude/ralph.md - define 3 question batches (technical foundation, feature scope, quality gates) with specific options
-- [x] Add Task(Explore) protocol to "Planning Phase" section - spawn parallel exploration agents before implementation
-- [x] Add code review protocol after "Task Completion Criteria" - spawn review agent before committing
-- [x] Add TodoWrite protocol for sub-task tracking - use TodoWrite to break down current SPEC task into actionable sub-steps
+```
+templates/.claude/
+├── ralph.md              # Coding standards ONLY (~300 lines)
+│                         # - Language preferences
+│                         # - Code style, testing, architecture
+│                         # - Git commit standards
+│                         # - Security, dependencies
+│                         # - Anti-patterns, tools, principles
+│
+├── skills/
+│   └── ralph-iterate/
+│       └── SKILL.md      # Iteration protocol ONLY (~850 lines)
+│                         # - Load context, explore, plan
+│                         # - Implement, review, commit
+│                         # - All Claude Code native features
+│
+└── settings.json.example # Hook configuration
+```
 
-## Phase 2: Create /ralph-iterate Skill
+**Key principle:** ralph.md = "how to write good code", SKILL.md = "how to run an iteration"
 
-- [x] Create .claude/skills/ralph-iterate/SKILL.md with frontmatter (name, description, allowed-tools, context: fork)
-- [x] Write skill body: Load Context step (read SPEC, index.md, use TodoWrite for sub-tasks)
-- [x] Write skill body: Explore step (spawn parallel Task(Explore) agents for codebase understanding)
-- [x] Write skill body: Plan step (write plan.md with goal, files, tests, exit criteria)
-- [x] Write skill body: Implement step (code + tests, run npm test and type-check)
-- [x] Write skill body: Review step (spawn Task agent for code review, address critical issues)
-- [x] Write skill body: Commit step (git commit, update index.md, check SPEC task)
+## Phase 1: Refactor ralph.md (Lean Standards)
 
-## Phase 3: Add Stop Hook Validation
+- [ ] Remove iteration protocol sections from ralph.md (keep only coding standards)
+- [ ] Remove "Claude Code Native Features" section (move to SKILL.md intro)
+- [ ] Remove "Creating SPECs (Interactive)" section (move to SKILL.md or separate doc)
+- [ ] Remove "Memory System" section (already in SKILL.md)
+- [ ] Remove "Task Completion Criteria" section (in SKILL.md)
+- [ ] Remove "Code Review Protocol" section (in SKILL.md)
+- [ ] Remove "Sub-Task Tracking Protocol" section (in SKILL.md)
+- [ ] Remove "Progress Updates" section (in SKILL.md)
+- [ ] Remove "Error Recovery" section (in SKILL.md)
+- [ ] Remove "Hooks Configuration" section (reference settings.json.example instead)
+- [ ] Keep: Language, Code Style, Testing, Architecture, Git, Performance, Security, Dependencies, Anti-Patterns, Tools, Principles
 
-- [x] Create scripts/validate-iteration.md with LLM prompt for iteration validation (check: task implemented, tests pass, commit made, index.md updated)
-- [x] Add hook configuration example to templates/.claude/settings.json.example for Stop hook with type: prompt
-- [x] Document hook setup in templates/.claude/ralph.md under new "Hooks Configuration" section
+## Phase 2: Enhance SKILL.md
 
-## Phase 4: Update Templates and Documentation
+- [ ] Add "Claude Code Native Features" overview at the top of SKILL.md
+- [ ] Add "Creating SPECs" section with AskUserQuestion protocol to SKILL.md
+- [ ] Add brief reference to ralph.md for coding standards ("Follow standards in ralph.md")
+- [ ] Verify SKILL.md is self-contained for running iterations
 
-- [x] Update templates/.claude/ralph.md to sync with .claude/CLAUDE.md (they should match)
-- [x] Add "Claude Code Native Features" section to ralph.md explaining the integration
-- [x] Update ralph init command to copy skill directory if it exists
+## Phase 3: Single Source of Truth
 
-## Phase 5: Testing and Validation
+- [ ] Delete .claude/skills/ralph-iterate/SKILL.md (project's own copy)
+- [ ] Update .claude/CLAUDE.md to remove Ralph-specific iteration details (keep coding standards)
+- [ ] Add note in ralph.md: "For iteration protocol, see /ralph-iterate skill"
 
-- [ ] Test AskUserQuestion flow manually - verify structured interview produces good SPEC
-- [ ] Test /ralph-iterate skill in isolation - verify it follows the protocol
-- [ ] Test Stop hook validation - verify it catches incomplete iterations
-- [ ] Run full ralph run -n 3 with new features on a test project
+## Phase 4: Validation
+
+- [ ] Verify ralph.md is ~300 lines (down from ~830)
+- [ ] Verify SKILL.md contains all iteration guidance
+- [ ] Run tests to ensure no regressions
+- [ ] Test ralph init creates correct structure
 
 ## Success Criteria
-- SPEC creation uses AskUserQuestion with structured options
-- Each iteration spawns exploration agents before planning
-- Code review agent runs before each commit
-- TodoWrite shows sub-task progress during iteration
-- /ralph-iterate skill can be invoked standalone
-- Stop hook catches iterations that didn't complete properly
-- All existing tests still pass
+- ralph.md focused on coding standards only (~300 lines)
+- SKILL.md is the single source for iteration protocol
+- No duplication between files
+- Clear separation: standards vs protocol
+- Templates are the authoritative source

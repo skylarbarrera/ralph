@@ -1,16 +1,14 @@
 ## Goal
-Update ralph init command to copy the skill directory (.claude/skills/ralph-iterate) if it exists in templates.
+Create new SPEC for v3.1 to address duplication and bloat issues from v3 integration.
 
 ## Files
-- src/commands/init.ts - add skill directory copying logic
-- tests for init command (if they exist)
+- SPEC.md - new spec for reducing template duplication
 
 ## Tests
-- Verify skill directory is copied when it exists in templates
-- Verify init still works when skill directory doesn't exist
+- N/A (planning only)
 
 ## Exit Criteria
-- ralph init copies .claude/skills/ directory from templates
-- Existing init functionality unchanged
-- Tests pass
+- SPEC.md contains clear problem statement and phased solution
 - Changes committed
+
+## Status: COMPLETED ✓
