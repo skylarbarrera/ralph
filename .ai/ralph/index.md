@@ -278,3 +278,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 542 passing (existing tests, no regressions)
 - notes: Copied SKILL.md to templates; init already does recursive copying so no code changes needed
 - next: Test AskUserQuestion flow manually
+
+## a048557 — Create v3.1 spec to reduce template duplication
+- files: SPEC.md
+- tests: N/A (planning)
+- notes: New spec to fix bloat/duplication: ralph.md for standards only, SKILL.md for iteration protocol
+- next: Phase 1 - refactor ralph.md to remove iteration protocol sections
