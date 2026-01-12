@@ -73,6 +73,26 @@ AskUserQuestion({
 2. Ask Batch 2 → scope features based on architecture
 3. Ask Batch 3 → set quality expectations
 4. Generate SPEC → create structured tasks
+5. **STOP** → wait for user approval before implementing
+
+### After SPEC Creation - CHECKPOINT
+
+**CRITICAL: After creating a SPEC, STOP and wait for explicit user confirmation.**
+
+Do NOT automatically proceed to implementation (Step 1: Load Context).
+
+After writing SPEC.md:
+1. Show the user a summary of what was created (task count, major milestones)
+2. Ask: "The SPEC is ready. Would you like to review it first, or should I start the first iteration?"
+3. Wait for explicit confirmation ("start", "begin", "yes", "proceed")
+
+**Only proceed to implementation after the user confirms.**
+
+Users may want to:
+- Review and edit the SPEC
+- Adjust task priorities
+- Add more requirements
+- Run `ralph run` manually later
 
 ## Writing SPECs
 
