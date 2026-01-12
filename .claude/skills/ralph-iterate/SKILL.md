@@ -291,13 +291,164 @@ Add JWT token refresh endpoint that returns a new access token when given a vali
 
 ## Step 4: Implement
 
-1. Write the code following existing patterns
-2. Write tests alongside implementation
-3. Run tests: `npm test` (or project-specific command)
-4. Run type check: `npm run type-check` (if TypeScript)
-5. Fix any failures before proceeding
+Now execute your plan. Write the code, write the tests, and verify everything works before proceeding to review.
 
-Update TodoWrite status as you complete sub-tasks.
+### 4.1 Write the Code
+
+Follow your plan's Files section. For each file:
+
+1. **Read first** — Understand existing code before modifying
+2. **Follow patterns** — Match the codebase's style, conventions, and architecture
+3. **Keep it simple** — Don't over-engineer or add features beyond the plan
+4. **Update TodoWrite** — Mark sub-task as `in_progress` when you start
+
+```typescript
+// Before starting a sub-task:
+TodoWrite({
+  todos: [
+    { content: "Create login endpoint", activeForm: "Creating login endpoint", status: "in_progress" },
+    { content: "Add input validation", activeForm: "Adding input validation", status: "pending" },
+    // ...
+  ]
+})
+```
+
+**Implementation order:**
+1. Types/interfaces first (if TypeScript)
+2. Core logic
+3. Integration points (exports, routes, etc.)
+4. Tests (or write alongside — see 4.2)
+
+**Avoid:**
+- Adding comments unless truly necessary (code should be self-documenting)
+- Creating new patterns when existing patterns work
+- Scope creep — if you discover something outside the plan, note it for the next iteration
+
+### 4.2 Write the Tests
+
+Write tests that match your plan's Tests section. Each test scenario becomes a test case.
+
+**Test structure:**
+```typescript
+describe('RefreshToken', () => {
+  describe('refresh', () => {
+    it('returns new access token when refresh token is valid', async () => {
+      // Arrange - set up test data
+      const refreshToken = createValidRefreshToken();
+
+      // Act - call the function
+      const result = await refresh(refreshToken);
+
+      // Assert - verify the outcome
+      expect(result.accessToken).toBeDefined();
+      expect(result.expiresIn).toBe(3600);
+    });
+
+    it('returns 401 when refresh token is expired', async () => {
+      const expiredToken = createExpiredRefreshToken();
+
+      await expect(refresh(expiredToken))
+        .rejects.toThrow(UnauthorizedError);
+    });
+  });
+});
+```
+
+**Guidelines:**
+- **One assertion per test** (when practical) — easier to debug failures
+- **Descriptive names** — test name should describe the scenario
+- **Cover the plan** — every test in your Tests section should become a real test
+- **Match existing patterns** — look at how similar features are tested
+
+**Update TodoWrite after writing tests:**
+```typescript
+TodoWrite({
+  todos: [
+    { content: "Create login endpoint", activeForm: "Creating login endpoint", status: "completed" },
+    { content: "Add input validation", activeForm: "Adding input validation", status: "completed" },
+    { content: "Write unit tests", activeForm: "Writing unit tests", status: "in_progress" },
+    // ...
+  ]
+})
+```
+
+### 4.3 Run Tests
+
+Run the full test suite to verify your implementation:
+
+```bash
+# Standard commands (use project-specific if different)
+npm test                    # Run all tests
+npm test -- --coverage      # Run with coverage report
+npm test -- path/to/file    # Run specific test file
+```
+
+**What to check:**
+- All tests pass (especially your new ones)
+- No regressions in existing tests
+- Coverage meets requirements (80%+ for new code)
+
+**If tests fail:**
+1. Read the error message carefully
+2. Fix the failing test or implementation
+3. Re-run tests
+4. Don't proceed until all tests pass
+
+### 4.4 Run Type Check
+
+For TypeScript projects, verify types before proceeding:
+
+```bash
+npm run type-check          # or: npx tsc --noEmit
+```
+
+**Common type errors and fixes:**
+
+| Error | Fix |
+|-------|-----|
+| `Property does not exist` | Add the property to the interface or check for typos |
+| `Type X is not assignable to Y` | Fix the type mismatch or add proper type casting |
+| `Cannot find module` | Check import path or add missing dependency |
+| `Argument of type X is not assignable` | Update function signature or caller |
+
+**Don't proceed with type errors.** They often indicate real bugs.
+
+### 4.5 Handle Failures
+
+If tests or type checking fail repeatedly:
+
+1. **Don't force it** — Repeated failures signal a deeper issue
+2. **Check your plan** — Did you miss something in the Files section?
+3. **Revisit exploration** — Maybe you need more context
+4. **Scope down** — Can you complete a smaller portion of the task?
+
+**If blocked:**
+```typescript
+// Update TodoWrite to reflect the blocker
+TodoWrite({
+  todos: [
+    { content: "Create login endpoint", activeForm: "Creating login endpoint", status: "completed" },
+    { content: "Fix type error in auth middleware", activeForm: "Fixing type error", status: "in_progress" },
+    // Don't mark as completed if you can't finish it
+  ]
+})
+```
+
+If you can't complete the task:
+- Don't commit partial/broken code
+- Document the blocker in STATE.txt
+- Stop the iteration — the next iteration will pick it up
+
+### Implementation Checklist
+
+Before proceeding to Review:
+
+- [ ] All planned files created/modified
+- [ ] Code follows existing patterns
+- [ ] Tests written for all planned scenarios
+- [ ] `npm test` passes
+- [ ] `npm run type-check` passes (TypeScript)
+- [ ] TodoWrite sub-tasks marked as completed
 
 ## Step 5: Review
 

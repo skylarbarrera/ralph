@@ -1,14 +1,14 @@
 ## Goal
-Enhance the Plan step in the /ralph-iterate skill with detailed guidance on writing plan.md files, including goal clarity, file listing, test strategies, and exit criteria examples.
+Enhance Step 4 (Implement) in the ralph-iterate skill with detailed guidance for writing code with tests and running verification commands.
 
 ## Files
-- .claude/skills/ralph-iterate/SKILL.md - enhance Step 3 with 4 sub-sections
+- .claude/skills/ralph-iterate/SKILL.md - expand Step 4 with sub-sections
 
 ## Tests
 - N/A (documentation only)
 
 ## Exit Criteria
-- Step 3 has 4 sub-sections: Goal section, Files section, Tests section, Exit Criteria section
-- Each sub-section has clear guidance and examples
-- Format matches Steps 1 and 2 (detailed sub-sections with ### headers)
+- Step 4 has detailed sub-sections matching the style of Steps 1-3
+- Covers: writing code, writing tests, running tests, running type-check, handling failures
+- Includes TodoWrite status updates guidance
 - Changes committed
