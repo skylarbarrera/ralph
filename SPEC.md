@@ -29,7 +29,7 @@ Enhance Ralph to leverage Claude Code's native capabilities: AskUserQuestion for
 
 ## Phase 3: Add Stop Hook Validation
 
-- [ ] Create scripts/validate-iteration.md with LLM prompt for iteration validation (check: task implemented, tests pass, commit made, index.md updated)
+- [x] Create scripts/validate-iteration.md with LLM prompt for iteration validation (check: task implemented, tests pass, commit made, index.md updated)
 - [ ] Add hook configuration example to templates/.claude/settings.json.example for Stop hook with type: prompt
 - [ ] Document hook setup in templates/.claude/ralph.md under new "Hooks Configuration" section
 

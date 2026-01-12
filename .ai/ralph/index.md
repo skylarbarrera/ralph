@@ -242,3 +242,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: N/A (documentation)
 - notes: Added 6 sub-sections (Stage Changes, Commit Message, Update index.md, Update SPEC.md, Update STATE.txt, Update TodoWrite); HEREDOC example; commit types table; flow diagram
 - next: Create scripts/validate-iteration.md for Stop hook validation
+
+## d0a1824 — Add validate-iteration.md prompt for Stop hook
+- files: scripts/validate-iteration.md, .ai/ralph/plan.md
+- tests: N/A (documentation/prompt)
+- notes: 7-point checklist (task, tests, types, commit, index, spec, state); JSON output format with valid/invalid; example outputs for common scenarios
+- next: Add hook configuration example to templates/.claude/settings.json.example

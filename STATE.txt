@@ -344,3 +344,11 @@
   - Commit checklist for verifying iteration completion
   - Commit: 51535df docs(skill): enhance Commit step with detailed git and tracking guidance
 
+✅ 2026-01-12: Created validate-iteration.md prompt for Stop hook
+  - Created scripts/validate-iteration.md with LLM validation prompt
+  - 7-point checklist: task, tests, types, commit, index, spec, state
+  - JSON output format with valid/invalid status and issues array
+  - Example outputs for common scenarios (valid, failed tests, no commit)
+  - Special case handling for docs-only, non-TypeScript, partial tasks
+  - Commit: d0a1824 docs(hooks): add validate-iteration.md prompt for Stop hook
+
