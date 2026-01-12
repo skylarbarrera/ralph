@@ -101,3 +101,31 @@ export function loadSpecFromDir(dir: string): SpecStructure | null {
   const specPath = join(dir, 'SPEC.md');
   return parseSpec(specPath);
 }
+
+export function parseSpecTitle(content: string): string | null {
+  const lines = content.split('\n');
+  for (const line of lines) {
+    const match = line.match(/^#\s+(.+)$/);
+    if (match) {
+      return match[1].trim();
+    }
+  }
+  return null;
+}
+
+export function getSpecTitle(specPath: string): string | null {
+  if (!existsSync(specPath)) {
+    return null;
+  }
+  const content = readFileSync(specPath, 'utf-8');
+  return parseSpecTitle(content);
+}
+
+export function isSpecComplete(specPath: string): boolean {
+  if (!existsSync(specPath)) {
+    return false;
+  }
+  const content = readFileSync(specPath, 'utf-8');
+  const hasUncheckedTasks = /^-\s*\[\s*\]\s+/m.test(content);
+  return !hasUncheckedTasks;
+}

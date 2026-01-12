@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from 'ink';
 import { Command } from 'commander';
 import { readFileSync, existsSync, unlinkSync, copyFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +12,8 @@ import { IterationRunner } from './App.js';
 import { runInit } from './commands/init.js';
 import { validateProject } from './commands/run.js';
 import { runUpgrade, detectVersion, getVersionName, CURRENT_VERSION } from './commands/upgrade.js';
+import { createFeatureBranch } from './lib/git.js';
+import { getSpecTitle } from './lib/spec-parser.js';
 
 export const DEFAULT_PROMPT = `You are Ralph, an autonomous coding assistant running in a loop.
 
@@ -34,6 +36,7 @@ export interface RunOptions {
   saveJsonl?: string;
   quiet: boolean;
   title?: string;
+  noBranch: boolean;
 }
 
 export type CliOptions = RunOptions;
@@ -65,6 +68,21 @@ export function executeRun(options: RunOptions): void {
       console.error(`  - ${error}`);
     }
     process.exit(1);
+  }
+
+  if (!options.noBranch) {
+    const specPath = join(options.cwd, 'SPEC.md');
+    const title = getSpecTitle(specPath);
+    if (title) {
+      const result = createFeatureBranch(options.cwd, title);
+      if (result.created) {
+        console.log(`Created branch: ${result.branchName}`);
+      } else if (result.branchName) {
+        console.log(`Using branch: ${result.branchName}`);
+      } else if (result.error) {
+        console.warn(`Warning: ${result.error}`);
+      }
+    }
   }
 
   const prompt = resolvePrompt(options);
@@ -147,6 +165,7 @@ function main(): void {
     .option('--save-jsonl <path>', 'Save raw JSONL output to file')
     .option('--quiet', 'Suppress output (just run iterations)', false)
     .option('--title <text>', 'Override task title display')
+    .option('--no-branch', 'Skip feature branch creation')
     .action((opts) => {
       let iterations = parseInt(opts.iterations, 10);
       const all = opts.all ?? false;
@@ -166,6 +185,7 @@ function main(): void {
         saveJsonl: opts.saveJsonl,
         quiet: opts.quiet,
         title: opts.title,
+        noBranch: opts.branch === false,
       };
 
       executeRun(options);

@@ -7,9 +7,10 @@ import { PhaseIndicator } from './components/PhaseIndicator.js';
 import { StatusBar } from './components/StatusBar.js';
 import { CompletedIterationsList } from './components/CompletedIterationsList.js';
 import { useClaudeStream, type UseClaudeStreamOptions, type ClaudeStreamState } from './hooks/useClaudeStream.js';
+import { join } from 'path';
 import type { Stats } from './lib/state-machine.js';
 import type { LastCommit } from './lib/types.js';
-import { loadSpecFromDir, getTaskForIteration, type SpecStructure } from './lib/spec-parser.js';
+import { loadSpecFromDir, getTaskForIteration, isSpecComplete, type SpecStructure } from './lib/spec-parser.js';
 
 export interface IterationResult {
   iteration: number;
@@ -195,13 +196,26 @@ export function IterationRunner({
       return;
     }
 
+    const targetDir = cwd ?? process.cwd();
+    const specPath = join(targetDir, 'SPEC.md');
+
+    if (isSpecComplete(specPath)) {
+      setIsComplete(true);
+      return;
+    }
+
+    const updatedSpec = loadSpecFromDir(targetDir);
+    if (updatedSpec) {
+      setSpec(updatedSpec);
+    }
+
     if (currentIteration < totalIterations) {
       setCurrentIteration((prev) => prev + 1);
       setIterationKey((prev) => prev + 1);
     } else {
       setIsComplete(true);
     }
-  }, [currentIteration, totalIterations]);
+  }, [currentIteration, totalIterations, cwd]);
 
   useEffect(() => {
     if (isComplete && !_mockIsComplete) {

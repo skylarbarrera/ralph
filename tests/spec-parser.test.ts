@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseSpecContent, getTaskForIteration, type SpecStructure } from '../src/lib/spec-parser.js';
+import { parseSpecContent, getTaskForIteration, parseSpecTitle, type SpecStructure } from '../src/lib/spec-parser.js';
 
 const SAMPLE_SPEC = `# Project Name
 
@@ -130,6 +130,58 @@ describe('spec-parser', () => {
 
     it('returns null for iteration beyond total', () => {
       expect(getTaskForIteration(spec, 5)).toBeNull();
+    });
+  });
+
+  describe('parseSpecTitle', () => {
+    it('extracts H1 title from spec content', () => {
+      const content = '# User Authentication System\n\nSome description';
+      expect(parseSpecTitle(content)).toBe('User Authentication System');
+    });
+
+    it('returns null if no H1 found', () => {
+      const content = '## Only H2 here\n\nSome text';
+      expect(parseSpecTitle(content)).toBeNull();
+    });
+
+    it('returns first H1 if multiple exist', () => {
+      const content = '# First Title\n\n# Second Title';
+      expect(parseSpecTitle(content)).toBe('First Title');
+    });
+
+    it('trims whitespace from title', () => {
+      const content = '#   Padded Title   \n\nContent';
+      expect(parseSpecTitle(content)).toBe('Padded Title');
+    });
+
+    it('handles empty content', () => {
+      expect(parseSpecTitle('')).toBeNull();
+    });
+
+    it('extracts title from SAMPLE_SPEC', () => {
+      expect(parseSpecTitle(SAMPLE_SPEC)).toBe('Project Name');
+    });
+  });
+
+  describe('isSpecComplete (via parseSpecContent)', () => {
+    it('returns tasks when unchecked tasks exist', () => {
+      const content = `# Project
+- [x] Task 1
+- [ ] Task 2`;
+      const result = parseSpecContent(content);
+      expect(result?.totalIterations).toBe(1);
+    });
+
+    it('returns null when all tasks are checked', () => {
+      const content = `# Project
+- [x] Task 1
+- [x] Task 2`;
+      expect(parseSpecContent(content)).toBeNull();
+    });
+
+    it('returns null when no tasks exist', () => {
+      const content = '# Project\n\nJust some text';
+      expect(parseSpecContent(content)).toBeNull();
     });
   });
 });

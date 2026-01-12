@@ -22,6 +22,7 @@ describe('cli', () => {
         cwd: '/test',
         timeoutIdle: 120,
         quiet: false,
+        noBranch: false,
       };
 
       expect(resolvePrompt(options)).toBe('Custom prompt text');
@@ -38,6 +39,7 @@ describe('cli', () => {
         cwd: '/test',
         timeoutIdle: 120,
         quiet: false,
+        noBranch: false,
       };
 
       expect(resolvePrompt(options)).toBe('Prompt from file content');
@@ -55,6 +57,7 @@ describe('cli', () => {
         cwd: '/test',
         timeoutIdle: 120,
         quiet: false,
+        noBranch: false,
       };
 
       expect(() => resolvePrompt(options)).toThrow('Prompt file not found: /test/missing.txt');
@@ -67,6 +70,7 @@ describe('cli', () => {
         cwd: '/test',
         timeoutIdle: 120,
         quiet: false,
+        noBranch: false,
       };
 
       expect(resolvePrompt(options)).toBe(DEFAULT_PROMPT);
@@ -84,6 +88,7 @@ describe('cli', () => {
         cwd: '/test',
         timeoutIdle: 120,
         quiet: false,
+        noBranch: false,
       };
 
       expect(resolvePrompt(options)).toBe('Direct prompt');
