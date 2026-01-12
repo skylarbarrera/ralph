@@ -1,17 +1,14 @@
 ## Goal
-Enhance the Commit step (Step 6) in SKILL.md with detailed guidance for git commit, index.md updates, and SPEC task completion.
+Create scripts/validate-iteration.md with an LLM prompt that validates Ralph iteration completion (check: task implemented, tests pass, commit made, index.md updated).
 
 ## Files
-- .claude/skills/ralph-iterate/SKILL.md - enhance Step 6: Commit section
+- scripts/validate-iteration.md - new file with LLM validation prompt
 
 ## Tests
-N/A - documentation-only change
+- N/A (documentation/prompt file only)
 
 ## Exit Criteria
-- Step 6 follows same structure as other steps (numbered sub-sections)
-- Git commit guidance includes: staging, message format, HEREDOC example
-- Index.md update guidance includes: format template, what to include
-- SPEC.md and STATE.txt update guidance included
-- TodoWrite status updates documented
-- Commit checklist added at end
+- scripts/validate-iteration.md exists with comprehensive validation prompt
+- Prompt checks: task implemented, tests pass, commit made, index.md updated
+- Prompt provides clear pass/fail output format
 - Changes committed
