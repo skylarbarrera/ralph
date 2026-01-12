@@ -260,6 +260,37 @@ Before starting work in a Ralph loop:
 
 Lazy load context. SPEC has the tasks; only read progress/index if you need to verify state.
 
+### Claude Code Native Features
+
+Ralph leverages Claude Code's native capabilities to enhance the development loop:
+
+| Feature | Tool | Purpose |
+|---------|------|---------|
+| **SPEC Interviews** | `AskUserQuestion` | Gather requirements through structured multi-choice questions before generating SPECs |
+| **Codebase Exploration** | `Task(Explore)` | Spawn parallel agents to understand architecture, patterns, and conventions before planning |
+| **Code Review** | `Task(general-purpose)` | Automatic pre-commit review to catch bugs, security issues, and pattern violations |
+| **Progress Tracking** | `TodoWrite` | Break SPEC tasks into sub-steps with real-time status updates |
+| **Iteration Validation** | Stop Hook | LLM-based validation that checks task completion before allowing next iteration |
+
+**How They Work Together:**
+
+```
+1. User requests new project
+   └─> AskUserQuestion gathers requirements (3 batches)
+   └─> Generate SPEC.md with structured tasks
+
+2. Each iteration:
+   ├─> TodoWrite breaks task into sub-steps
+   ├─> Task(Explore) agents understand relevant code (parallel)
+   ├─> Write plan.md with goal, files, tests
+   ├─> Implement code + tests
+   ├─> Task(general-purpose) reviews changes
+   ├─> Commit + update tracking files
+   └─> Stop hook validates iteration completion
+```
+
+Each feature is documented in detail in the sections below.
+
 ### Creating SPECs (Interactive)
 
 When a user asks to create a new SPEC, use the **AskUserQuestion** tool to conduct a structured interview. This ensures you gather all requirements before generating the SPEC.
