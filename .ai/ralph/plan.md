@@ -1,14 +1,15 @@
 ## Goal
-Create scripts/validate-iteration.md with an LLM prompt that validates Ralph iteration completion (check: task implemented, tests pass, commit made, index.md updated).
+Create settings.json.example template with Stop hook configuration that uses the validate-iteration.md prompt to validate Ralph iterations.
 
 ## Files
-- scripts/validate-iteration.md - new file with LLM validation prompt
+- templates/.claude/settings.json.example - new file with hook configuration
 
 ## Tests
-- N/A (documentation/prompt file only)
+- N/A (configuration template file)
 
 ## Exit Criteria
-- scripts/validate-iteration.md exists with comprehensive validation prompt
-- Prompt checks: task implemented, tests pass, commit made, index.md updated
-- Prompt provides clear pass/fail output format
+- settings.json.example exists in templates/.claude/
+- Contains Stop hook with type: prompt
+- Hook references scripts/validate-iteration.md
+- Includes other common Ralph-related settings
 - Changes committed
