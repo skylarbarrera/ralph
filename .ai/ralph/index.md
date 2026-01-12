@@ -224,3 +224,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: N/A (documentation)
 - notes: Added 4 sub-sections (Write the Goal, List the Files, Define the Tests, Set Exit Criteria); good/bad goal examples; complete plan template; post-planning workflow
 - next: Enhance Implement step (code + tests, run npm test and type-check)
+
+## 9ba6886 — Enhance Implement step with detailed code and test guidance
+- files: .claude/skills/ralph-iterate/SKILL.md, .ai/ralph/plan.md
+- tests: N/A (documentation)
+- notes: Added 5 sub-sections (Write the Code, Write the Tests, Run Tests, Run Type Check, Handle Failures); TodoWrite status updates; implementation checklist; common type errors table
+- next: Enhance Review step (spawn Task agent for code review)

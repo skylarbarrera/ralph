@@ -320,3 +320,10 @@
   - Post-planning workflow (review scope, update TodoWrite, proceed to implementation)
   - Commit: 1125a3a docs(skill): enhance Plan step with detailed guidance for writing plan.md
 
+✅ 2026-01-12: Enhanced Implement step with detailed code and test guidance
+  - Added 5 sub-sections: Write the Code, Write the Tests, Run Tests, Run Type Check, Handle Failures
+  - TodoWrite status updates at each stage of implementation
+  - Implementation checklist for pre-review verification
+  - Common type errors table with fixes
+  - Commit: 9ba6886 docs(skill): enhance Implement step with detailed code and test guidance
+
