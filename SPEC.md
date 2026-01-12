@@ -15,7 +15,7 @@ Enhance Ralph to leverage Claude Code's native capabilities: AskUserQuestion for
 - [x] Add AskUserQuestion protocol to "Creating SPECs" section in templates/.claude/ralph.md - define 3 question batches (technical foundation, feature scope, quality gates) with specific options
 - [x] Add Task(Explore) protocol to "Planning Phase" section - spawn parallel exploration agents before implementation
 - [x] Add code review protocol after "Task Completion Criteria" - spawn review agent before committing
-- [ ] Add TodoWrite protocol for sub-task tracking - use TodoWrite to break down current SPEC task into actionable sub-steps
+- [x] Add TodoWrite protocol for sub-task tracking - use TodoWrite to break down current SPEC task into actionable sub-steps
 
 ## Phase 2: Create /ralph-iterate Skill
 

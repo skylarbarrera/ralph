@@ -194,3 +194,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: N/A (documentation only)
 - notes: New "Code Review Protocol" section with Task agent example, when to review/skip, handling CRITICAL vs SUGGESTIONS, example flow
 - next: Add TodoWrite protocol for sub-task tracking
+
+## 81b8407 — Add TodoWrite protocol for sub-task tracking
+- files: templates/.claude/ralph.md
+- tests: N/A (documentation only)
+- notes: New "Sub-Task Tracking Protocol" section with TodoWrite structure, example call, workflow, integration diagram with SPEC tasks
+- next: Create /ralph-iterate skill

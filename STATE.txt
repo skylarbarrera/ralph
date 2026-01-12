@@ -285,3 +285,12 @@
   - Example review flow from implementation to commit
   - Commit: 81f9433 docs(ralph): add code review protocol for pre-commit agent review
 
+✅ 2026-01-12: Added TodoWrite protocol for sub-task tracking
+  - Added "Sub-Task Tracking Protocol" section after "Code Review Protocol"
+  - Documents when to use TodoWrite (3+ steps) vs skip (atomic tasks)
+  - TodoWrite structure: content, activeForm, status fields
+  - Example breaking down auth feature into 5 trackable sub-tasks
+  - Workflow: start with sub-tasks, track progress, complete before commit
+  - Integration diagram showing SPEC task → sub-tasks → commit flow
+  - Commit: 81b8407 docs(ralph): add TodoWrite protocol for sub-task tracking
+
