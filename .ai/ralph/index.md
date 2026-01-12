@@ -200,3 +200,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: N/A (documentation only)
 - notes: New "Sub-Task Tracking Protocol" section with TodoWrite structure, example call, workflow, integration diagram with SPEC tasks
 - next: Create /ralph-iterate skill
+
+## d867cb4 — Create ralph-iterate skill with frontmatter
+- files: .claude/skills/ralph-iterate/SKILL.md
+- tests: N/A (skill configuration)
+- notes: Frontmatter (name, description, context: fork, allowed-tools); body has 6 steps (Load Context, Explore, Plan, Implement, Review, Commit)
+- next: Verify/enhance skill body steps (Load Context step)

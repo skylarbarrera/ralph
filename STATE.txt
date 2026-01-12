@@ -294,3 +294,9 @@
   - Integration diagram showing SPEC task → sub-tasks → commit flow
   - Commit: 81b8407 docs(ralph): add TodoWrite protocol for sub-task tracking
 
+✅ 2026-01-12: Created /ralph-iterate skill with frontmatter
+  - Created .claude/skills/ralph-iterate/SKILL.md
+  - Frontmatter: name, description, context: fork, allowed-tools
+  - Skill body includes 6-step iteration protocol (Load Context, Explore, Plan, Implement, Review, Commit)
+  - Commit: d867cb4 feat(skill): create ralph-iterate skill with frontmatter
+
