@@ -9,6 +9,98 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Task, TodoWrite, LSP
 
 Execute ONE complete Ralph iteration: read SPEC, plan, implement, test, review, commit.
 
+**For coding standards** (language, style, testing, git, security), see `ralph.md`.
+
+## Claude Code Native Features
+
+This skill leverages Claude Code's native capabilities:
+
+| Feature | Tool | When Used |
+|---------|------|-----------|
+| **Codebase Exploration** | `Task(Explore)` | Step 2 - understand code before planning |
+| **Progress Tracking** | `TodoWrite` | Steps 1-6 - track sub-task completion |
+| **Code Review** | `Task(general-purpose)` | Step 5 - pre-commit review |
+| **Iteration Validation** | Stop Hook | After Step 6 - verify iteration complete |
+
+## Creating SPECs
+
+When a user asks to create a new SPEC, use **AskUserQuestion** to gather requirements before writing.
+
+### Question Batches
+
+**Batch 1: Technical Foundation**
+```typescript
+AskUserQuestion({
+  questions: [
+    {
+      question: "What language and framework should we use?",
+      header: "Stack",
+      multiSelect: false,
+      options: [
+        { label: "TypeScript/Node.js (Recommended)", description: "Modern JS with type safety" },
+        { label: "Python", description: "Great for data, ML, scripting" },
+        { label: "Go", description: "Fast, good for systems" },
+        { label: "Rust", description: "Memory-safe systems programming" }
+      ]
+    },
+    {
+      question: "What type of application?",
+      header: "Type",
+      multiSelect: false,
+      options: [
+        { label: "CLI tool", description: "Command-line application" },
+        { label: "Web API", description: "REST/GraphQL backend" },
+        { label: "Library", description: "Reusable package" },
+        { label: "Full-stack", description: "Frontend + backend" }
+      ]
+    }
+  ]
+})
+```
+
+**Batch 2: Feature Scope**
+- Core features (multiSelect: true)
+- Authentication needed?
+- External integrations?
+
+**Batch 3: Quality Gates**
+- Testing level (unit only / unit+integration / full)
+- Documentation needs
+
+### Interview Flow
+
+1. Ask Batch 1 → understand technical constraints
+2. Ask Batch 2 → scope features based on architecture
+3. Ask Batch 3 → set quality expectations
+4. Generate SPEC → create structured tasks
+
+## Writing SPECs
+
+Optimize for **iteration efficiency**. Each checkbox = one Ralph iteration.
+
+### Batch Related Tasks
+
+```markdown
+# BAD - 4 iterations
+- [ ] Create UserModel.ts
+- [ ] Create UserService.ts
+- [ ] Create UserController.ts
+- [ ] Create user.test.ts
+
+# GOOD - 1 iteration
+- [ ] Create User module (Model, Service, Controller) with tests
+```
+
+**Batch when:**
+- Same directory or tightly coupled files
+- Similar structure (4 similar components = 1 task)
+- Tests go with implementation
+
+**Don't batch when:**
+- Different areas of codebase
+- Complex logic needing focus
+- Independent failure modes
+
 ## Step 1: Load Context
 
 ### 1.1 Read SPEC.md
@@ -845,3 +937,31 @@ Tests Pass + Review Approved
 - Tests MUST pass before commit
 - No commit = no index entry
 - Mark SPEC task complete only after commit
+
+## Hooks Configuration
+
+Ralph uses a **Stop hook** to validate iteration completion. Configure in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "prompt",
+        "promptFile": "scripts/validate-iteration.md"
+      }
+    ]
+  }
+}
+```
+
+**What the hook validates:**
+1. Task implemented (code changes made)
+2. Tests pass (`npm test`)
+3. Type check passes (`npm run type-check`)
+4. Commit made with conventional message
+5. `index.md` updated with new entry
+6. `SPEC.md` task checked off
+7. `STATE.txt` has completion record
+
+**If validation fails:** Fix the issue before the next iteration starts.
