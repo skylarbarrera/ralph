@@ -130,6 +130,77 @@ Before starting work in a Ralph loop:
 
 Lazy load context. SPEC has the tasks; only read progress/index if you need to verify state.
 
+### Creating SPECs (Interactive)
+
+When a user asks to create a new SPEC, use the **AskUserQuestion** tool to conduct a structured interview. This ensures you gather all requirements before generating the SPEC.
+
+**Three Question Batches:**
+
+Run these in sequence, using the answers from each batch to inform the next:
+
+**Batch 1: Technical Foundation**
+```
+AskUserQuestion with questions:
+- "Language/Framework?" - Options: TypeScript/Node.js, Python, Go, Rust
+- "Architecture?" - Options: CLI tool, Web API, Library, Full-stack app
+- "Primary data store?" - Options: None/in-memory, SQLite/file-based, PostgreSQL/MySQL, Redis/MongoDB
+```
+
+**Batch 2: Feature Scope**
+```
+AskUserQuestion with questions:
+- "Core features?" - (multiSelect: true) Options based on architecture choice
+- "Authentication needed?" - Options: None, API keys, JWT/sessions, OAuth
+- "External integrations?" - (multiSelect: true) Options: None, REST APIs, Webhooks, Message queues
+```
+
+**Batch 3: Quality Gates**
+```
+AskUserQuestion with questions:
+- "Testing level?" - Options: Unit tests only, Unit + integration, Full coverage (unit/integration/e2e)
+- "Documentation needs?" - Options: Code comments only, README + API docs, Full documentation site
+```
+
+**Example AskUserQuestion Call:**
+
+```typescript
+AskUserQuestion({
+  questions: [
+    {
+      question: "What language and framework should we use?",
+      header: "Stack",
+      multiSelect: false,
+      options: [
+        { label: "TypeScript/Node.js (Recommended)", description: "Modern JS with type safety, great for APIs and CLIs" },
+        { label: "Python", description: "Excellent for data processing, ML, and scripting" },
+        { label: "Go", description: "Fast compilation, great for systems and networking" },
+        { label: "Rust", description: "Memory safety, ideal for performance-critical systems" }
+      ]
+    },
+    {
+      question: "What type of application is this?",
+      header: "Type",
+      multiSelect: false,
+      options: [
+        { label: "CLI tool", description: "Command-line interface application" },
+        { label: "Web API", description: "REST or GraphQL backend service" },
+        { label: "Library", description: "Reusable package/module" },
+        { label: "Full-stack app", description: "Frontend + backend application" }
+      ]
+    }
+  ]
+})
+```
+
+**Interview Flow:**
+
+1. **Ask Batch 1** → Understand technical constraints
+2. **Ask Batch 2** → Scope features based on architecture
+3. **Ask Batch 3** → Set quality expectations
+4. **Generate SPEC** → Create structured tasks optimized for iteration efficiency
+
+**Important:** When starting a new project, replace the existing SPEC.md entirely. Each SPEC represents one project or feature set.
+
 ### Writing SPECs
 
 When generating a SPEC, optimize for **iteration efficiency**. Each checkbox = one Ralph iteration (~3 min), so structure matters.

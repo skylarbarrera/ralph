@@ -1,19 +1,23 @@
 ## Goal
-Integrate new activity components into App.tsx: replace ToolList with ActivityFeed, add PhaseIndicator, show commit in results.
+Add AskUserQuestion protocol to templates/.claude/ralph.md for structured SPEC creation interviews with 3 question batches.
 
 ## Files
-- src/App.tsx - replace ToolList with ActivityFeed, add PhaseIndicator, pass commit to iteration results
-- tests/App.test.tsx - update tests for new components
+- templates/.claude/ralph.md - add new "Creating SPECs (Interactive)" section before "Writing SPECs"
+
+## Changes
+Add new section with:
+1. Introduction explaining when to use AskUserQuestion for SPEC creation
+2. Three question batches:
+   - Technical foundation (language, framework, architecture)
+   - Feature scope (core features, data storage, integrations)
+   - Quality gates (testing, security, performance requirements)
+3. Example AskUserQuestion tool call with structured options
+4. Flow description of interview → SPEC generation
 
 ## Tests
-- ActivityFeed renders in place of ToolList
-- PhaseIndicator displays correct phase
-- Commit info passed to onIterationComplete callback
-- All existing tests updated and passing
+- N/A (documentation-only change)
 
 ## Exit Criteria
-- App uses ActivityFeed instead of ToolList
-- PhaseIndicator visible in App layout
-- Commit summary included in iteration results
-- All tests pass
+- New "Creating SPECs (Interactive)" section added to templates/.claude/ralph.md
+- Section defines 3 question batches with specific options
 - Changes committed
