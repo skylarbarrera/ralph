@@ -612,21 +612,231 @@ Before proceeding to Commit:
 
 ## Step 6: Commit
 
-1. Stage changes: `git add [files]`
-2. Commit with conventional message:
-   ```
-   type(scope): brief description
-   ```
-3. Append to `.ai/ralph/index.md`:
-   ```markdown
-   ## {sha} — {commit message}
-   - files: {changed files}
-   - tests: {count} passing
-   - notes: {key decisions}
-   - next: {logical follow-up}
-   ```
-4. Update `SPEC.md` - check off completed task: `- [x]`
-5. Update `STATE.txt` with completion details
+After your implementation passes review, commit your changes and update the tracking files. This step completes the iteration and leaves a clean trail for the next one.
+
+### 6.1 Stage Your Changes
+
+Stage only the files listed in your plan. Don't stage unrelated changes:
+
+```bash
+# Stage specific files (preferred)
+git add src/auth/refresh.ts src/auth/types.ts tests/auth/refresh.test.ts
+
+# Or stage all tracked changes if you're certain
+git add -A
+```
+
+**Pre-stage checklist:**
+- [ ] Only files from your plan's Files section
+- [ ] No temporary files, logs, or build artifacts
+- [ ] No `.env` files or secrets
+- [ ] No unintended formatting changes in other files
+
+**Check what you're committing:**
+```bash
+git status        # See staged files
+git diff --staged # Review staged changes
+```
+
+### 6.2 Write the Commit Message
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format. Always use a HEREDOC for proper multi-line formatting:
+
+```bash
+git commit -m "$(cat <<'EOF'
+type(scope): brief description
+
+Longer explanation if needed.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+EOF
+)"
+```
+
+**Commit types:**
+| Type | Use for |
+|------|---------|
+| `feat` | New feature or functionality |
+| `fix` | Bug fix |
+| `refactor` | Code change that doesn't add feature or fix bug |
+| `test` | Adding or updating tests |
+| `docs` | Documentation only |
+| `chore` | Maintenance tasks, dependency updates |
+
+**Examples:**
+```
+feat(auth): add JWT token refresh endpoint
+fix(api): handle null response from user service
+refactor(utils): extract validation into shared module
+test(auth): add edge case tests for token expiry
+docs(readme): add API documentation
+```
+
+**Scope guidelines:**
+- Use the feature area or module name: `auth`, `api`, `ui`, `db`
+- Keep it lowercase and short (1-2 words)
+- Be consistent with existing commits in the repo
+
+### 6.3 Update index.md
+
+After committing, append an entry to `.ai/ralph/index.md`. This creates a searchable history of what each iteration accomplished.
+
+**Get your commit SHA:**
+```bash
+git log -1 --format='%h'  # Short SHA (7 chars)
+```
+
+**Entry format:**
+```markdown
+## {sha} — {commit message}
+- files: {list of changed files}
+- tests: {test count} passing
+- notes: {key decisions, patterns used, gotchas}
+- next: {logical follow-up task or recommendation}
+```
+
+**Example entry:**
+```markdown
+## a1b2c3d — feat(auth): add JWT token refresh endpoint
+- files: src/auth/refresh.ts, src/auth/types.ts, tests/auth/refresh.test.ts
+- tests: 8 passing
+- notes: Used existing JWT library, added refresh token rotation for security
+- next: Add token revocation endpoint for logout
+```
+
+**Guidelines:**
+- **Keep it concise** — 5-7 lines max per entry
+- **files**: List actual filenames, not directories
+- **tests**: Include count (get from `npm test` output)
+- **notes**: Capture decisions future iterations need to know
+- **next**: Suggest what should come next (helps the next iteration)
+
+### 6.4 Update SPEC.md
+
+Check off the completed task in `SPEC.md`:
+
+```markdown
+# Before
+- [ ] Add JWT token refresh endpoint with tests
+
+# After
+- [x] Add JWT token refresh endpoint with tests
+```
+
+**Rules:**
+- Only check off tasks that are **fully complete**
+- One checkbox = one iteration (don't check multiple)
+- If you couldn't complete the task, leave it unchecked
+
+### 6.5 Update STATE.txt
+
+Append a completion record to `STATE.txt`:
+
+```markdown
+✅ YYYY-MM-DD: {Brief description of what was done}
+  - {Key detail 1}
+  - {Key detail 2}
+  - Tests: {count} passing
+  - Commit: {sha} {commit message}
+```
+
+**Example:**
+```markdown
+✅ 2026-01-12: Added JWT token refresh endpoint
+  - Created refresh.ts with token validation and rotation
+  - Added RefreshTokenPayload interface to types.ts
+  - Tests: 8 passing (refresh.test.ts)
+  - Commit: a1b2c3d feat(auth): add JWT token refresh endpoint
+```
+
+**If task was blocked:**
+```markdown
+⚠️ 2026-01-12: JWT token refresh - BLOCKED
+  - Issue: Existing JWT library doesn't support refresh tokens
+  - Attempted: Custom implementation but hit type conflicts
+  - Next: Evaluate alternative JWT libraries
+```
+
+### 6.6 Update TodoWrite
+
+Complete all sub-tasks:
+
+```typescript
+TodoWrite({
+  todos: [
+    { content: "Write implementation code", activeForm: "Writing code", status: "completed" },
+    { content: "Write unit tests", activeForm: "Writing tests", status: "completed" },
+    { content: "Run tests and type check", activeForm: "Running verification", status: "completed" },
+    { content: "Code review", activeForm: "Reviewing code", status: "completed" },
+    { content: "Commit changes", activeForm: "Committing", status: "completed" }
+  ]
+})
+```
+
+**After updating:**
+- All sub-tasks should be `completed`
+- The TodoWrite list shows the user the iteration is done
+- Clear the list for the next iteration (or let the next iteration reset it)
+
+### Commit Checklist
+
+Before considering this iteration complete:
+
+- [ ] All planned files are staged
+- [ ] No unintended files staged (run `git status`)
+- [ ] Commit message follows conventional format
+- [ ] Commit message uses HEREDOC (no escaping issues)
+- [ ] `.ai/ralph/index.md` has new entry with correct SHA
+- [ ] `SPEC.md` task is checked off: `- [x]`
+- [ ] `STATE.txt` has completion record
+- [ ] TodoWrite sub-tasks marked completed
+
+### Commit Flow Example
+
+```
+Tests Pass + Review Approved
+           │
+           ▼
+┌────────────────────────┐
+│  git add [files]       │
+│  git status (verify)   │
+└────────────────────────┘
+           │
+           ▼
+┌────────────────────────┐
+│  git commit with       │
+│  HEREDOC message       │
+└────────────────────────┘
+           │
+           ▼
+┌────────────────────────┐
+│  Get SHA: git log -1   │
+│  Append to index.md    │
+└────────────────────────┘
+           │
+           ▼
+┌────────────────────────┐
+│  Update SPEC.md        │
+│  - [ ] → - [x]         │
+└────────────────────────┘
+           │
+           ▼
+┌────────────────────────┐
+│  Update STATE.txt      │
+│  ✅ completion record  │
+└────────────────────────┘
+           │
+           ▼
+┌────────────────────────┐
+│  TodoWrite: all        │
+│  status: "completed"   │
+└────────────────────────┘
+           │
+           ▼
+      ITERATION DONE
+```
 
 ## Hard Rules
 
