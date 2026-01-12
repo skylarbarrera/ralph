@@ -32,6 +32,36 @@ This file defines coding standards and preferences for AI agents working in Ralp
   - Public API documentation (JSDoc/docstrings)
   - "Why" not "what" - explain reasoning, not mechanics
 
+**Bad:**
+```typescript
+// Get the user name
+const userName = user.name;
+
+// Loop through items
+for (const item of items) {
+  // Process the item
+  processItem(item);
+}
+```
+
+**Good:**
+```typescript
+const userName = user.name;
+
+for (const item of items) {
+  processItem(item);
+}
+```
+
+**Acceptable comment:**
+```typescript
+// Use binary search instead of linear - dataset can be 100k+ items
+const index = binarySearch(sortedItems, target);
+
+// Edge case: API returns null instead of empty array for new users
+const orders = response.orders ?? [];
+```
+
 ### Naming Conventions
 - Use descriptive, meaningful names
 - Prefer `getUserById` over `get` or `fetchUser`
@@ -65,6 +95,30 @@ This file defines coding standards and preferences for AI agents working in Ralp
 - Integration tests for workflows
 - E2E tests for critical user paths
 
+### Test Structure
+```typescript
+describe('UserService', () => {
+  describe('getUserById', () => {
+    it('returns user when found', async () => {
+      // Arrange
+      const userId = '123';
+      const expectedUser = { id: userId, name: 'Alice' };
+
+      // Act
+      const user = await userService.getUserById(userId);
+
+      // Assert
+      expect(user).toEqual(expectedUser);
+    });
+
+    it('throws NotFoundError when user does not exist', async () => {
+      await expect(userService.getUserById('nonexistent'))
+        .rejects.toThrow(NotFoundError);
+    });
+  });
+});
+```
+
 ## Architecture Patterns
 
 ### Keep It Simple
@@ -72,6 +126,22 @@ This file defines coding standards and preferences for AI agents working in Ralp
 - Avoid premature abstraction
 - Three similar lines > one premature abstraction
 - Build for current requirements, not hypothetical future
+
+### File Organization
+```
+src/
+├── models/          # Data models/types
+├── services/        # Business logic
+├── controllers/     # Request handlers (if web app)
+├── utils/           # Pure utility functions
+├── config/          # Configuration
+└── index.ts         # Entry point
+
+tests/
+├── unit/
+├── integration/
+└── e2e/
+```
 
 ### Separation of Concerns
 - Models: Data structures only
@@ -101,10 +171,39 @@ Longer explanation if needed.
 - `docs:` Documentation only changes
 - `chore:` Maintenance tasks
 
+**Examples:**
+```
+feat(auth): add JWT token refresh mechanism
+
+fix(api): handle null response from user service
+
+refactor(utils): extract duplicate validation logic
+
+test(user-service): add tests for edge cases
+```
+
 ### Commit Size
 - **One logical change per commit**
 - Commits should be atomic and revertable
 - If you can't describe it in one line, it's probably too big
+
+## Performance Considerations
+
+### Do Optimize
+- Database queries (use indexes, avoid N+1)
+- API response times (< 200ms ideal)
+- Bundle sizes for web apps
+- Memory leaks in long-running processes
+
+### Don't Optimize Prematurely
+- Micro-optimizations before profiling
+- Complex caching before measuring benefit
+- Over-engineering for hypothetical scale
+
+### When to Profile
+- After implementing a feature, before optimizing
+- When performance issues are reported
+- For critical paths (hot loops, frequent API calls)
 
 ## Security Best Practices
 
@@ -119,6 +218,37 @@ Longer explanation if needed.
 - `.env` files with real credentials
 - Private keys or certificates
 - Personal or sensitive data
+
+### Authentication & Authorization
+- Use established libraries (Passport.js, Auth0, etc.)
+- Never roll your own crypto
+- Implement rate limiting
+- Use HTTPS only in production
+
+## Dependencies
+
+### When to Add Dependencies
+- Established, well-maintained libraries for complex problems
+- Security-critical functionality (auth, crypto)
+- Significant time savings vs. implementation cost
+
+### When NOT to Add Dependencies
+- Simple utilities you can write in 10 lines
+- Poorly maintained packages (old, few contributors)
+- Dependencies with dependencies with dependencies
+- For functionality already in stdlib
+
+### Check Before Adding
+```bash
+# Check package stats
+npm info <package>
+
+# Check for vulnerabilities
+npm audit
+
+# Check bundle size impact
+npx bundlephobia <package>
+```
 
 ## Ralph-Specific Guidelines
 
@@ -588,16 +718,86 @@ If `valid` is `false`, the hook provides specific issues that need to be address
 
 To run Ralph without validation (e.g., for debugging), remove the Stop hook from settings.json or rename the file temporarily.
 
+## Code Review Checklist
+
+Before committing, verify:
+- [ ] Code works (manual test + automated tests)
+- [ ] Tests pass with good coverage
+- [ ] No linting errors
+- [ ] No commented-out code
+- [ ] No console.log/print statements (use proper logging)
+- [ ] No TODO comments (convert to tasks)
+- [ ] Error handling is present
+- [ ] Security vulnerabilities checked
+- [ ] Performance is acceptable
+- [ ] Commit message is clear
+
 ## Anti-Patterns to Avoid
 
-- Catch and ignore errors without logging
-- Use `any` type in TypeScript
-- Mutate function parameters
-- Write god functions (> 100 lines)
-- Nest callbacks > 3 levels deep
-- Copy-paste code instead of extracting function
-- Skip tests "to save time"
-- Commit broken code
+### Don't Do This
+- ❌ Catch and ignore errors without logging
+- ❌ Use `any` type in TypeScript
+- ❌ Mutate function parameters
+- ❌ Write god functions (> 100 lines)
+- ❌ Nest callbacks > 3 levels deep
+- ❌ Copy-paste code instead of extracting function
+- ❌ Skip tests "to save time"
+- ❌ Commit broken code
+- ❌ Push directly to main without PR (in team settings)
+
+### Do This Instead
+- ✅ Log errors with context, then throw/return
+- ✅ Use specific types (string, number, CustomType)
+- ✅ Return new values, don't mutate
+- ✅ Extract into smaller, named functions
+- ✅ Use async/await or Promises
+- ✅ Extract to shared utility function
+- ✅ Write tests first or immediately after
+- ✅ Fix before committing
+- ✅ Use feature branches + PR for review
+
+## Tools and Linters
+
+### Recommended Setup
+
+**TypeScript:**
+```json
+{
+  "extends": "@typescript-eslint/recommended",
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "no-console": "warn"
+  }
+}
+```
+
+**Python:**
+```ini
+[tool:pytest]
+testpaths = tests
+python_files = test_*.py
+python_functions = test_*
+addopts = --cov=src --cov-report=html --cov-report=term
+
+[mypy]
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+```
+
+### Run Before Every Commit
+```bash
+# TypeScript
+npm run lint
+npm run type-check
+npm test
+
+# Python
+pylint src/
+mypy src/
+pytest --cov=src --cov-fail-under=80
+```
 
 ## Philosophical Principles
 
@@ -605,7 +805,10 @@ To run Ralph without validation (e.g., for debugging), remove the Stop hook from
 2. **Explicit over implicit** - Make intentions clear
 3. **Working over perfect** - Ship working code, iterate
 4. **Tested over untested** - Tests are documentation that code works
-5. **Consistent over innovative** - Follow existing patterns in codebase
+5. **Documented over undocumented** - Future you will thank present you
+6. **Consistent over innovative** - Follow existing patterns in codebase
+
+---
 
 When in doubt, prioritize:
 1. **Working code** - Does it work?
