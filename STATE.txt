@@ -358,3 +358,10 @@
   - Common Ralph permission patterns (npm test, vitest, git commands)
   - Commit: 1fc21e0 docs(hooks): add settings.json.example with Stop hook configuration
 
+✅ 2026-01-12: Added Hooks Configuration section to ralph.md
+  - New "Hooks Configuration" section after "Error Recovery"
+  - Documents Stop hook purpose and settings.json setup
+  - Explains 7-point validation checklist and JSON output format
+  - Includes troubleshooting table for common validation failures
+  - Commit: b51ebad docs(hooks): add Hooks Configuration section to ralph.md
+

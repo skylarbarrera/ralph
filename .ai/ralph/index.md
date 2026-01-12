@@ -254,3 +254,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: N/A (configuration template)
 - notes: Stop hook with type: prompt pointing to scripts/validate-iteration.md; common Ralph permission patterns (npm test, vitest, git commands)
 - next: Document hook setup in templates/.claude/ralph.md under "Hooks Configuration" section
+
+## b51ebad — Add Hooks Configuration section to ralph.md
+- files: templates/.claude/ralph.md, .ai/ralph/plan.md
+- tests: N/A (documentation only)
+- notes: Documents Stop hook purpose, settings.json setup, 7-point validation checklist, JSON output format, troubleshooting table
+- next: Update templates/.claude/ralph.md to sync with .claude/CLAUDE.md
