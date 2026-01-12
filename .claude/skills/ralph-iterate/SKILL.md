@@ -11,10 +11,78 @@ Execute ONE complete Ralph iteration: read SPEC, plan, implement, test, review, 
 
 ## Step 1: Load Context
 
-1. Read `SPEC.md` to find the next incomplete task (unchecked `- [ ]`)
-2. Read `STATE.txt` if unsure what's been completed
-3. Read last 3-5 entries from `.ai/ralph/index.md` for recent context
-4. Use **TodoWrite** to break the SPEC task into sub-tasks (if 3+ steps)
+### 1.1 Read SPEC.md
+
+Find the next incomplete task:
+- Look for the first unchecked checkbox: `- [ ]`
+- Skip checked items: `- [x]`
+- A batched checkbox counts as ONE task (e.g., "Create components A, B, C" = 1 task)
+
+```
+Read SPEC.md → Find first `- [ ]` → This is your task for this iteration
+```
+
+### 1.2 Check STATE.txt (if needed)
+
+Read `STATE.txt` when:
+- Unsure if a task was partially completed
+- Need to understand blockers from previous iterations
+- Want to verify what was done vs what SPEC shows
+
+Look for:
+- ✅ entries (completed work)
+- ⚠️ entries (blockers or issues)
+- Last completion timestamp
+
+### 1.3 Read Recent Context
+
+Read **last 3-5 entries** from `.ai/ralph/index.md`:
+- Extract file patterns (what files were recently changed)
+- Note "next:" hints (what the previous iteration recommended)
+- Understand recent architectural decisions
+
+**Don't read the entire index** — only recent entries to stay context-efficient.
+
+### 1.4 Break Down with TodoWrite
+
+If the task has **3+ steps**, use TodoWrite to track sub-tasks:
+
+```typescript
+TodoWrite({
+  todos: [
+    {
+      content: "Read existing auth code",
+      activeForm: "Reading existing auth code",
+      status: "pending"
+    },
+    {
+      content: "Create login endpoint",
+      activeForm: "Creating login endpoint",
+      status: "pending"
+    },
+    {
+      content: "Add input validation",
+      activeForm: "Adding input validation",
+      status: "pending"
+    },
+    {
+      content: "Write unit tests",
+      activeForm: "Writing unit tests",
+      status: "pending"
+    }
+  ]
+})
+```
+
+**Required fields:**
+- `content`: Imperative form (what to do)
+- `activeForm`: Present continuous (what's happening)
+- `status`: "pending" | "in_progress" | "completed"
+
+**Skip TodoWrite when:**
+- Task is atomic (single file, single change)
+- Task is documentation-only
+- Task can be completed in under 3 steps
 
 ## Step 2: Explore (if needed)
 
