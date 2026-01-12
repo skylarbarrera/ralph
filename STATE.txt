@@ -277,3 +277,11 @@
     - How to use exploration results in planning
   - Commit: 953b42c docs(ralph): add Task(Explore) protocol for parallel codebase exploration
 
+✅ 2026-01-12: Added code review protocol for pre-commit agent review
+  - Added "Code Review Protocol" section after "Task Completion Criteria"
+  - Documents when to review (after tests, before commit) vs skip (docs-only, config)
+  - Task agent example with structured review prompt (bugs, tests, patterns, security, performance)
+  - Handling feedback table: CRITICAL (fix), SUGGESTIONS (optional), APPROVED (commit)
+  - Example review flow from implementation to commit
+  - Commit: 81f9433 docs(ralph): add code review protocol for pre-commit agent review
+

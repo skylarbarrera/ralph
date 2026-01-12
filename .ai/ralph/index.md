@@ -188,3 +188,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: N/A (documentation only)
 - notes: Added step to Planning Phase for spawning exploration agents; detailed protocol with when to explore/skip, example code, guidance on using results
 - next: Add code review protocol after Task Completion Criteria
+
+## 81f9433 — Add code review protocol for pre-commit agent review
+- files: templates/.claude/ralph.md
+- tests: N/A (documentation only)
+- notes: New "Code Review Protocol" section with Task agent example, when to review/skip, handling CRITICAL vs SUGGESTIONS, example flow
+- next: Add TodoWrite protocol for sub-task tracking
