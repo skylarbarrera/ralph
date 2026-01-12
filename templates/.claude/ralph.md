@@ -259,7 +259,8 @@ Ralph uses commit-anchored memory to maintain context efficiently.
 
 Before implementing any task:
 1. Read SPEC.md, STATE.txt, and last 3 entries from index.md
-2. Write plan to `.ai/ralph/plan.md` using this format:
+2. **Spawn exploration agents** (if needed) to understand unfamiliar code
+3. Write plan to `.ai/ralph/plan.md` using this format:
 ```markdown
 ## Goal
 One sentence describing what this iteration accomplishes.
@@ -277,6 +278,58 @@ One sentence describing what this iteration accomplishes.
 - Tests pass with 80%+ coverage
 - Changes committed
 ```
+
+**Task(Explore) Protocol:**
+
+Before writing your plan, spawn parallel exploration agents to understand unfamiliar parts of the codebase. This is faster than reading files sequentially and helps you make better architectural decisions.
+
+**When to Explore:**
+- Working in a new area of the codebase
+- Task involves multiple interconnected modules
+- Unsure about existing patterns or conventions
+- Need to understand how similar features were implemented
+
+**When to Skip:**
+- Working on a file you've modified recently
+- Simple changes to isolated functions
+- Task is well-defined with specific file paths in SPEC
+
+**Spawn Parallel Agents:**
+
+Use the Task tool with `subagent_type='Explore'` to spawn agents that search the codebase in parallel:
+
+```typescript
+// Spawn 2-3 exploration agents in parallel (single message with multiple Task calls)
+Task({
+  subagent_type: 'Explore',
+  description: 'Find auth patterns',
+  prompt: 'Find how authentication is implemented. Look for middleware, JWT handling, session management. Report file paths and key patterns.'
+})
+
+Task({
+  subagent_type: 'Explore',
+  description: 'Find test patterns',
+  prompt: 'Find testing patterns for API endpoints. Look for test setup, mocking strategies, assertion patterns. Report examples I can follow.'
+})
+
+Task({
+  subagent_type: 'Explore',
+  description: 'Find error handling',
+  prompt: 'Find error handling patterns. Look for custom error classes, error middleware, response formatting. Report the conventions used.'
+})
+```
+
+**What to Explore:**
+- **Architecture**: "How is [feature] structured? What files/modules are involved?"
+- **Patterns**: "What patterns are used for [X]? Show me examples."
+- **Dependencies**: "What does [module] depend on? What depends on it?"
+- **Conventions**: "What naming/file structure conventions are used?"
+
+**Using Results:**
+- Wait for all agents to complete before writing plan
+- Incorporate discovered file paths into your plan's Files section
+- Follow patterns the agents identify (don't invent new ones)
+- Note any concerns or blockers in your plan
 
 **Memory Index Format:**
 

@@ -1,23 +1,15 @@
 ## Goal
-Add AskUserQuestion protocol to templates/.claude/ralph.md for structured SPEC creation interviews with 3 question batches.
+Add Task(Explore) protocol to the "Planning Phase" section in templates/.claude/ralph.md - define how to spawn parallel exploration agents for codebase understanding before implementation.
 
 ## Files
-- templates/.claude/ralph.md - add new "Creating SPECs (Interactive)" section before "Writing SPECs"
-
-## Changes
-Add new section with:
-1. Introduction explaining when to use AskUserQuestion for SPEC creation
-2. Three question batches:
-   - Technical foundation (language, framework, architecture)
-   - Feature scope (core features, data storage, integrations)
-   - Quality gates (testing, security, performance requirements)
-3. Example AskUserQuestion tool call with structured options
-4. Flow description of interview → SPEC generation
+- templates/.claude/ralph.md - add new subsection under Planning Phase
 
 ## Tests
-- N/A (documentation-only change)
+- N/A (documentation only)
 
 ## Exit Criteria
-- New "Creating SPECs (Interactive)" section added to templates/.claude/ralph.md
-- Section defines 3 question batches with specific options
+- Planning Phase section includes Task(Explore) protocol
+- Protocol explains when to spawn parallel agents
+- Example shows how to use Task tool with subagent_type='Explore'
+- Guidance on what to explore (files, patterns, architecture)
 - Changes committed
