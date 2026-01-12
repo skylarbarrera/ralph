@@ -415,6 +415,69 @@ Respond with:
 7. Commit changes
 ```
 
+### Sub-Task Tracking Protocol
+
+Use the **TodoWrite** tool to break down complex SPEC tasks into granular, trackable sub-steps. This provides real-time visibility into progress and helps maintain focus.
+
+**When to Use TodoWrite:**
+- SPEC task has 3+ distinct steps
+- Task spans multiple files or concerns
+- Implementation order matters
+- You want to track progress through a complex task
+
+**When to Skip:**
+- Simple, single-action tasks
+- Task is already atomic (one file, one change)
+- Quick fixes under 5 minutes
+
+**TodoWrite Structure:**
+
+Each sub-task needs three fields:
+- `content`: Imperative description ("Create auth middleware")
+- `activeForm`: Present continuous for display ("Creating auth middleware")
+- `status`: One of `pending`, `in_progress`, `completed`
+
+**Example TodoWrite Call:**
+
+```typescript
+// Breaking down: "Add user authentication with JWT"
+TodoWrite({
+  todos: [
+    { content: "Create User model with password hash field", activeForm: "Creating User model", status: "in_progress" },
+    { content: "Add JWT token generation utility", activeForm: "Adding JWT utilities", status: "pending" },
+    { content: "Create auth middleware for route protection", activeForm: "Creating auth middleware", status: "pending" },
+    { content: "Add login and register endpoints", activeForm: "Adding auth endpoints", status: "pending" },
+    { content: "Write tests for auth flow", activeForm: "Writing auth tests", status: "pending" }
+  ]
+})
+```
+
+**Workflow:**
+
+1. **Start of task**: Read SPEC task, break into sub-tasks, call TodoWrite with first item as `in_progress`
+2. **During implementation**: Update status to `completed` as you finish each sub-task, set next to `in_progress`
+3. **End of task**: All sub-tasks should be `completed` before committing
+
+**Rules:**
+- Only ONE sub-task should be `in_progress` at a time
+- Mark completed IMMEDIATELY after finishing (don't batch)
+- Sub-tasks should map to discrete, verifiable actions
+- Keep sub-tasks small enough to complete in <10 minutes each
+
+**Integration with SPEC Tasks:**
+
+```
+SPEC Task (checkbox):     "Add user authentication with JWT"
+                              ↓
+Sub-Tasks (TodoWrite):    1. Create User model ✓
+                          2. Add JWT utilities ✓
+                          3. Create auth middleware ●  ← in_progress
+                          4. Add auth endpoints
+                          5. Write tests
+                              ↓
+Commit + check SPEC:      [x] Add user authentication with JWT
+```
+
 ### Progress Updates
 When updating `STATE.txt`, be specific:
 ```
