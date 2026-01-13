@@ -189,6 +189,9 @@ export async function runSingleIteration(
     console.error(`[DEBUG] proc.spawnfile: ${(proc as any).spawnfile}`);
     console.error(`[DEBUG] proc.spawnargs: ${JSON.stringify((proc as any).spawnargs)}`);
 
+    // Close stdin to signal we're not sending any input
+    proc.stdin?.end();
+
     resetIdleTimer();
 
     proc.stdout?.on('data', (chunk: Buffer) => {
