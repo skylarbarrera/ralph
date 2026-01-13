@@ -16,6 +16,7 @@ import { createFeatureBranch } from './lib/git.js';
 import { getSpecTitle } from './lib/spec-parser.js';
 import { emitFailed } from './lib/headless-emitter.js';
 import { executeHeadlessRun as runHeadless } from './lib/headless-runner.js';
+import { validateSpecInDir, formatValidationResult } from './lib/spec-validator.js';
 
 export const DEFAULT_PROMPT = `You are Ralph, an autonomous coding assistant running in a loop.
 
@@ -226,19 +227,35 @@ function main(): void {
 
   program
     .command('validate')
-    .description('Check if current directory is ready for Ralph')
+    .description('Check if current directory is ready for Ralph and validate SPEC.md conventions')
     .option('--cwd <path>', 'Working directory to check', process.cwd())
+    .option('--spec-only', 'Only validate SPEC.md content (skip project structure check)', false)
     .action((opts) => {
       const cwd = resolve(opts.cwd);
-      const result = validateProject(cwd);
+      let hasErrors = false;
 
-      if (result.valid) {
-        console.log('Project is ready for Ralph!');
-      } else {
-        console.log('Issues found:');
-        for (const error of result.errors) {
-          console.log(`  - ${error}`);
+      if (!opts.specOnly) {
+        const projectResult = validateProject(cwd);
+        if (!projectResult.valid) {
+          console.log('Project structure issues:');
+          for (const error of projectResult.errors) {
+            console.log(`  - ${error}`);
+          }
+          hasErrors = true;
+        } else {
+          console.log('✓ Project structure is valid');
         }
+      }
+
+      const specResult = validateSpecInDir(cwd);
+      console.log('\nSPEC.md content validation:');
+      console.log(formatValidationResult(specResult));
+
+      if (!specResult.valid) {
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
         process.exit(1);
       }
     });
