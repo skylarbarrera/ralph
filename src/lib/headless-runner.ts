@@ -170,7 +170,8 @@ export async function runSingleIteration(
     ];
 
     // Debug: log the command being run to stderr
-    console.error(`[DEBUG] Spawning claude with args: ${args.join(' ')}`);
+    console.error(`[DEBUG] Spawning claude with args array:`);
+    args.forEach((arg, i) => console.error(`[DEBUG]   args[${i}]: ${JSON.stringify(arg)}`));
     console.error(`[DEBUG] cwd: ${options.cwd}`);
     console.error(`[DEBUG] ANTHROPIC_API_KEY present: ${!!process.env.ANTHROPIC_API_KEY}`);
 
@@ -181,6 +182,9 @@ export async function runSingleIteration(
     });
 
     console.error(`[DEBUG] Claude process spawned, pid: ${proc.pid}`);
+    console.error(`[DEBUG] proc.stdout: ${!!proc.stdout}, proc.stderr: ${!!proc.stderr}`);
+    console.error(`[DEBUG] proc.spawnfile: ${(proc as any).spawnfile}`);
+    console.error(`[DEBUG] proc.spawnargs: ${JSON.stringify((proc as any).spawnargs)}`);
 
     resetIdleTimer();
 
