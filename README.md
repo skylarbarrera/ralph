@@ -39,14 +39,14 @@ claude  # Run once to log in
 
 ### 3. Create Your SPEC
 
-Tell Claude what you want to build. Claude will ask clarifying questions and generate a SPEC for you:
+Tell Claude what you want to build. Use the `/create-spec` skill for a guided experience:
 
 ```bash
 claude
-> I want to build a REST API for managing users with authentication
+> /create-spec
 ```
 
-Claude will interview you about details (database choice, auth method, etc.) and create `SPEC.md`:
+Claude will interview you about your project (type, stack, features, constraints) and generate a well-structured `SPEC.md`. The skill includes LLM review to ensure the spec follows conventions.
 
 ```markdown
 # My Project
@@ -80,7 +80,7 @@ That's it! Check your git history to see what Ralph built.
 | `ralph run --all` | Run until SPEC complete |
 | `ralph run --headless` | Output JSON events (no UI) |
 | `ralph init` | Add Ralph to an existing project |
-| `ralph validate` | Check if project is ready |
+| `ralph validate` | Check project structure and SPEC conventions |
 | `ralph upgrade` | Upgrade project to latest version |
 
 ### Run Options
@@ -205,13 +205,16 @@ After running `ralph init`, your project looks like this:
 
 ```
 your-project/
-├── SPEC.md              # Your requirements (you write this)
+├── SPEC.md              # Your requirements (created via /create-spec)
 ├── STATE.txt            # Progress log (Ralph updates this)
 ├── .ai/ralph/
 │   ├── plan.md          # Current task plan
 │   └── index.md         # History of what Ralph did
 └── .claude/
-    └── ralph.md         # Coding standards for Ralph
+    ├── ralph.md         # Coding standards for Ralph
+    └── skills/
+        ├── create-spec/ # Guided spec creation with LLM review
+        └── ralph-iterate/ # Iteration execution protocol
 ```
 
 ## Adding Ralph to an Existing Project
