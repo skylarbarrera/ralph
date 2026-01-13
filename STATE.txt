@@ -393,3 +393,14 @@
   - Tests: 555 passing (13 new tests for headless-emitter)
   - Commit: da3e6ec feat(headless): add Phase 1 - headless flag and event emitter
 
+✅ 2026-01-12: Added Phase 2 - headless runner
+  - Created src/lib/headless-runner.ts with executeHeadlessRun() and runSingleIteration()
+  - Re-uses StreamParser and StateMachine for tool tracking and event parsing
+  - Emits JSON events via headless-emitter (started, iteration, tool, commit, task_complete, iteration_done, stuck, complete, failed)
+  - Tracks task completion by comparing SPEC.md before/after each iteration
+  - Stuck detection: exits with code 1 after N iterations without task progress
+  - Exit codes: 0=complete, 1=stuck, 2=max iterations, 3=error
+  - Added --stuck-threshold CLI option (default 3)
+  - Wired executeHeadlessRun in CLI to call headless runner
+  - Tests: 577 passing (22 new tests for headless-runner)
+

@@ -61,10 +61,10 @@ export function emit(event: RalphEvent): void {
 
 ## Phase 2: Headless Runner
 
-- [ ] Create `src/lib/headless-runner.ts`
-- [ ] Re-use existing `StreamParser` and `StateMachine`
-- [ ] Emit events instead of updating Ink UI
-- [ ] Wire up in CLI when `--headless` is passed
+- [x] Create `src/lib/headless-runner.ts`
+- [x] Re-use existing `StreamParser` and `StateMachine`
+- [x] Emit events instead of updating Ink UI
+- [x] Wire up in CLI when `--headless` is passed
 
 ```typescript
 // src/lib/headless-runner.ts

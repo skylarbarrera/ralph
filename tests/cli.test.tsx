@@ -24,6 +24,7 @@ describe('cli', () => {
         quiet: false,
         noBranch: false,
         headless: false,
+        stuckThreshold: 3,
       };
 
       expect(resolvePrompt(options)).toBe('Custom prompt text');
@@ -42,6 +43,7 @@ describe('cli', () => {
         quiet: false,
         noBranch: false,
         headless: false,
+        stuckThreshold: 3,
       };
 
       expect(resolvePrompt(options)).toBe('Prompt from file content');
@@ -61,6 +63,7 @@ describe('cli', () => {
         quiet: false,
         noBranch: false,
         headless: false,
+        stuckThreshold: 3,
       };
 
       expect(() => resolvePrompt(options)).toThrow('Prompt file not found: /test/missing.txt');
@@ -75,6 +78,7 @@ describe('cli', () => {
         quiet: false,
         noBranch: false,
         headless: false,
+        stuckThreshold: 3,
       };
 
       expect(resolvePrompt(options)).toBe(DEFAULT_PROMPT);
@@ -94,6 +98,7 @@ describe('cli', () => {
         quiet: false,
         noBranch: false,
         headless: false,
+        stuckThreshold: 3,
       };
 
       expect(resolvePrompt(options)).toBe('Direct prompt');

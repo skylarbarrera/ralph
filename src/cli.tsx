@@ -14,7 +14,8 @@ import { validateProject } from './commands/run.js';
 import { runUpgrade, detectVersion, getVersionName, CURRENT_VERSION } from './commands/upgrade.js';
 import { createFeatureBranch } from './lib/git.js';
 import { getSpecTitle } from './lib/spec-parser.js';
-import { emitStarted, emitFailed } from './lib/headless-emitter.js';
+import { emitFailed } from './lib/headless-emitter.js';
+import { executeHeadlessRun as runHeadless } from './lib/headless-runner.js';
 
 export const DEFAULT_PROMPT = `You are Ralph, an autonomous coding assistant running in a loop.
 
@@ -39,6 +40,7 @@ export interface RunOptions {
   title?: string;
   noBranch: boolean;
   headless: boolean;
+  stuckThreshold: number;
 }
 
 export type CliOptions = RunOptions;
@@ -113,7 +115,7 @@ export function executeRun(options: RunOptions): void {
   });
 }
 
-export function executeHeadlessRun(options: RunOptions): void {
+export async function executeHeadlessRun(options: RunOptions): Promise<void> {
   const validation = validateProject(options.cwd);
 
   if (!validation.valid) {
@@ -121,9 +123,17 @@ export function executeHeadlessRun(options: RunOptions): void {
     process.exit(3);
   }
 
-  emitStarted('SPEC.md', 0);
-  emitFailed('Headless runner not yet implemented (Phase 2)');
-  process.exit(3);
+  const prompt = resolvePrompt(options);
+  const exitCode = await runHeadless({
+    prompt,
+    cwd: options.cwd,
+    iterations: options.iterations,
+    stuckThreshold: options.stuckThreshold,
+    idleTimeoutMs: options.timeoutIdle * 1000,
+    saveJsonl: options.saveJsonl,
+  });
+
+  process.exit(exitCode);
 }
 
 function main(): void {
@@ -182,6 +192,7 @@ function main(): void {
     .option('--title <text>', 'Override task title display')
     .option('--no-branch', 'Skip feature branch creation')
     .option('--headless', 'Output JSON events instead of UI')
+    .option('--stuck-threshold <n>', 'Iterations without progress before stuck (headless)', '3')
     .action((opts) => {
       let iterations = parseInt(opts.iterations, 10);
       const all = opts.all ?? false;
@@ -203,6 +214,7 @@ function main(): void {
         title: opts.title,
         noBranch: opts.branch === false,
         headless: opts.headless ?? false,
+        stuckThreshold: parseInt(opts.stuckThreshold, 10),
       };
 
       if (options.headless) {

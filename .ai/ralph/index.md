@@ -290,3 +290,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 555 passing (13 new tests for headless-emitter)
 - notes: RalphEvent types for 9 event kinds; emit() writes JSON to stdout; --headless flag; executeHeadlessRun placeholder
 - next: Phase 2 - create headless-runner.ts to execute iterations without Ink UI
+
+## e251fd3 — Add Phase 2 - headless runner
+- files: src/lib/headless-runner.ts, src/cli.tsx, tests/cli.test.tsx, tests/lib/headless-runner.test.ts
+- tests: 577 passing (22 new tests for headless-runner)
+- notes: executeHeadlessRun() and runSingleIteration(); re-uses StreamParser/StateMachine; emits JSON events; stuck detection; exit codes (0=complete, 1=stuck, 2=max iterations, 3=error); --stuck-threshold CLI option
+- next: Phase 3 - stuck detection with configurable threshold
