@@ -14,6 +14,7 @@ import { validateProject } from './commands/run.js';
 import { runUpgrade, detectVersion, getVersionName, CURRENT_VERSION } from './commands/upgrade.js';
 import { createFeatureBranch } from './lib/git.js';
 import { getSpecTitle } from './lib/spec-parser.js';
+import { emitStarted, emitFailed } from './lib/headless-emitter.js';
 
 export const DEFAULT_PROMPT = `You are Ralph, an autonomous coding assistant running in a loop.
 
@@ -37,6 +38,7 @@ export interface RunOptions {
   quiet: boolean;
   title?: string;
   noBranch: boolean;
+  headless: boolean;
 }
 
 export type CliOptions = RunOptions;
@@ -111,6 +113,19 @@ export function executeRun(options: RunOptions): void {
   });
 }
 
+export function executeHeadlessRun(options: RunOptions): void {
+  const validation = validateProject(options.cwd);
+
+  if (!validation.valid) {
+    emitFailed(`Invalid project: ${validation.errors.join(', ')}`);
+    process.exit(3);
+  }
+
+  emitStarted('SPEC.md', 0);
+  emitFailed('Headless runner not yet implemented (Phase 2)');
+  process.exit(3);
+}
+
 function main(): void {
   const program = new Command();
 
@@ -166,6 +181,7 @@ function main(): void {
     .option('--quiet', 'Suppress output (just run iterations)', false)
     .option('--title <text>', 'Override task title display')
     .option('--no-branch', 'Skip feature branch creation')
+    .option('--headless', 'Output JSON events instead of UI')
     .action((opts) => {
       let iterations = parseInt(opts.iterations, 10);
       const all = opts.all ?? false;
@@ -186,9 +202,14 @@ function main(): void {
         quiet: opts.quiet,
         title: opts.title,
         noBranch: opts.branch === false,
+        headless: opts.headless ?? false,
       };
 
-      executeRun(options);
+      if (options.headless) {
+        executeHeadlessRun(options);
+      } else {
+        executeRun(options);
+      }
     });
 
   program
