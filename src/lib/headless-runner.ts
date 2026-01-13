@@ -169,27 +169,13 @@ export async function runSingleIteration(
       options.prompt,
     ];
 
-    // Debug: log the command being run to stderr
-    console.error(`[DEBUG] Spawning claude with args array:`);
-    args.forEach((arg, i) => console.error(`[DEBUG]   args[${i}]: ${JSON.stringify(arg)}`));
-    console.error(`[DEBUG] cwd: ${options.cwd}`);
-    console.error(`[DEBUG] ANTHROPIC_API_KEY present: ${!!process.env.ANTHROPIC_API_KEY}`);
-
-    // Use wrapper script for debugging if it exists
-    const claudeCommand = process.env.CLAUDE_WRAPPER || 'claude';
-    console.error(`[DEBUG] Using claude command: ${claudeCommand}`);
-    const proc = _spawnFn(claudeCommand, args, {
+    const proc = _spawnFn('claude', args, {
       cwd: options.cwd,
       env: process.env,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    console.error(`[DEBUG] Claude process spawned, pid: ${proc.pid}`);
-    console.error(`[DEBUG] proc.stdout: ${!!proc.stdout}, proc.stderr: ${!!proc.stderr}`);
-    console.error(`[DEBUG] proc.spawnfile: ${(proc as any).spawnfile}`);
-    console.error(`[DEBUG] proc.spawnargs: ${JSON.stringify((proc as any).spawnargs)}`);
-
-    // Close stdin to signal we're not sending any input
+    // Close stdin immediately - Claude waits for stdin close before starting
     proc.stdin?.end();
 
     resetIdleTimer();
@@ -197,7 +183,6 @@ export async function runSingleIteration(
     proc.stdout?.on('data', (chunk: Buffer) => {
       resetIdleTimer();
       const text = chunk.toString('utf-8');
-      console.error(`[DEBUG] stdout chunk: ${text.substring(0, 200)}...`);
       if (logger) {
         for (const line of text.split('\n')) {
           if (line.trim()) {
@@ -208,18 +193,15 @@ export async function runSingleIteration(
       parser.parseChunk(text);
     });
 
-    proc.stderr?.on('data', (chunk: Buffer) => {
+    proc.stderr?.on('data', () => {
       resetIdleTimer();
-      console.error(`[DEBUG] stderr: ${chunk.toString()}`);
     });
 
     proc.on('error', (err) => {
-      console.error(`[DEBUG] process error: ${err.message}`);
       finish(err);
     });
 
-    proc.on('close', (code) => {
-      console.error(`[DEBUG] process closed with code: ${code}`);
+    proc.on('close', () => {
       parser.flush();
       finish();
     });
