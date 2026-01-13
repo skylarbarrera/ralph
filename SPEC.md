@@ -114,23 +114,23 @@ export async function executeHeadlessRun(options: RunOptions): Promise<void> {
 
 ## Phase 3: Stuck Detection
 
-- [ ] Add `--stuck-threshold <n>` CLI option (default 3)
-- [ ] Track consecutive iterations without task completion
-- [ ] Emit `stuck` event and exit 1 when threshold exceeded
+- [x] Add `--stuck-threshold <n>` CLI option (default 3)
+- [x] Track consecutive iterations without task completion
+- [x] Emit `stuck` event and exit 1 when threshold exceeded
 
 ## Phase 4: Exit Codes
 
-- [ ] Exit 0 = All tasks complete
-- [ ] Exit 1 = Stuck (no progress after threshold)
-- [ ] Exit 2 = Max iterations reached
-- [ ] Exit 3 = Fatal error
+- [x] Exit 0 = All tasks complete
+- [x] Exit 1 = Stuck (no progress after threshold)
+- [x] Exit 2 = Max iterations reached
+- [x] Exit 3 = Fatal error
 
 ## Phase 5: Tests
 
-- [ ] Unit tests for `headless-emitter.ts`
-- [ ] Unit tests for `headless-runner.ts`
-- [ ] Integration test: headless run with mock SPEC
-- [ ] Integration test: stuck detection triggers correctly
+- [x] Unit tests for `headless-emitter.ts`
+- [x] Unit tests for `headless-runner.ts`
+- [x] Integration test: headless run with mock SPEC
+- [x] Integration test: stuck detection triggers correctly
 
 ---
 

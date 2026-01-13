@@ -404,3 +404,11 @@
   - Wired executeHeadlessRun in CLI to call headless runner
   - Tests: 577 passing (22 new tests for headless-runner)
 
+✅ 2026-01-12: Completed Phase 3, 4, 5 - stuck detection, exit codes, tests verified
+  - Phase 3 (stuck detection) was already implemented in Phase 2 entry
+  - Phase 4 (exit codes) was already implemented in Phase 2 entry
+  - Phase 5 (tests) were already written: 13 tests for headless-emitter, 22 tests for headless-runner
+  - Fixed TypeScript type error in headless-runner.test.ts (Readable stream type for mock stdout/stderr)
+  - Tests: 577 passing, type check passes
+  - All v0.3 headless mode phases complete
+

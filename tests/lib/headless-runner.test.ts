@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventEmitter } from 'events';
+import { Readable } from 'stream';
 import type { ChildProcess } from 'child_process';
 import {
   runSingleIteration,
@@ -34,21 +35,21 @@ vi.mock('../../src/lib/headless-emitter.js', () => ({
 }));
 
 function createMockProcess(): ChildProcess & {
-  stdout: EventEmitter;
-  stderr: EventEmitter;
+  stdout: Readable;
+  stderr: Readable;
   emitData: (data: string) => void;
   emitClose: () => void;
   emitError: (err: Error) => void;
 } {
   const proc = new EventEmitter() as ChildProcess & {
-    stdout: EventEmitter;
-    stderr: EventEmitter;
+    stdout: Readable;
+    stderr: Readable;
     emitData: (data: string) => void;
     emitClose: () => void;
     emitError: (err: Error) => void;
   };
-  proc.stdout = new EventEmitter();
-  proc.stderr = new EventEmitter();
+  proc.stdout = new Readable({ read() {} });
+  proc.stderr = new Readable({ read() {} });
   proc.kill = vi.fn();
 
   proc.emitData = (data: string) => {

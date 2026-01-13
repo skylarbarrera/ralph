@@ -295,4 +295,10 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - files: src/lib/headless-runner.ts, src/cli.tsx, tests/cli.test.tsx, tests/lib/headless-runner.test.ts
 - tests: 577 passing (22 new tests for headless-runner)
 - notes: executeHeadlessRun() and runSingleIteration(); re-uses StreamParser/StateMachine; emits JSON events; stuck detection; exit codes (0=complete, 1=stuck, 2=max iterations, 3=error); --stuck-threshold CLI option
-- next: Phase 3 - stuck detection with configurable threshold
+- next: Verify all phases complete, fix any type errors
+
+## (pending) — Complete v0.3 headless mode - Phases 3, 4, 5
+- files: tests/lib/headless-runner.test.ts, SPEC.md, STATE.txt
+- tests: 577 passing (type check passes)
+- notes: Phase 3/4/5 were already implemented in Phase 2; fixed TypeScript type error (Readable stream type for mock stdout/stderr); marked all phases complete in SPEC.md
+- next: v0.3 complete - Factory can now use `ralph run --headless` for programmatic integration
