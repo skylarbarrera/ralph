@@ -175,7 +175,10 @@ export async function runSingleIteration(
     console.error(`[DEBUG] cwd: ${options.cwd}`);
     console.error(`[DEBUG] ANTHROPIC_API_KEY present: ${!!process.env.ANTHROPIC_API_KEY}`);
 
-    const proc = _spawnFn('claude', args, {
+    // Use wrapper script for debugging if it exists
+    const claudeCommand = process.env.CLAUDE_WRAPPER || 'claude';
+    console.error(`[DEBUG] Using claude command: ${claudeCommand}`);
+    const proc = _spawnFn(claudeCommand, args, {
       cwd: options.cwd,
       env: process.env,
       stdio: ['pipe', 'pipe', 'pipe'],
