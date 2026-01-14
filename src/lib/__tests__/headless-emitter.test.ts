@@ -10,6 +10,7 @@ import {
   emitStuck,
   emitComplete,
   emitFailed,
+  emitWarning,
   type RalphEvent,
 } from '../headless-emitter.js';
 
@@ -225,6 +226,31 @@ describe('headless-emitter', () => {
       expect(JSON.parse(output[0])).toEqual({
         event: 'failed',
         error: 'Process crashed',
+      });
+    });
+  });
+
+  describe('emitWarning', () => {
+    it('emits warning event with files', () => {
+      emitWarning('todo_stub', 'Completed tasks contain TODO stubs', ['src/foo.ts', 'src/bar.ts']);
+
+      expect(output).toHaveLength(1);
+      expect(JSON.parse(output[0])).toEqual({
+        event: 'warning',
+        type: 'todo_stub',
+        message: 'Completed tasks contain TODO stubs',
+        files: ['src/foo.ts', 'src/bar.ts'],
+      });
+    });
+
+    it('emits warning event without files', () => {
+      emitWarning('quality', 'Code quality issues detected');
+
+      expect(output).toHaveLength(1);
+      expect(JSON.parse(output[0])).toEqual({
+        event: 'warning',
+        type: 'quality',
+        message: 'Code quality issues detected',
       });
     });
   });

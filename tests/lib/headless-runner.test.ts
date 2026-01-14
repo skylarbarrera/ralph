@@ -7,6 +7,7 @@ import {
   executeHeadlessRun,
   getCompletedTaskTexts,
   getTotalTaskCount,
+  detectTodoStubs,
   EXIT_CODE_COMPLETE,
   EXIT_CODE_STUCK,
   EXIT_CODE_MAX_ITERATIONS,
@@ -32,6 +33,7 @@ vi.mock('../../src/lib/headless-emitter.js', () => ({
   emitStuck: vi.fn(),
   emitComplete: vi.fn(),
   emitFailed: vi.fn(),
+  emitWarning: vi.fn(),
 }));
 
 function createMockProcess(): ChildProcess & {
@@ -125,6 +127,13 @@ describe('headless-runner', () => {
       const result = getTotalTaskCount('/test');
 
       expect(result).toBe(4);
+    });
+  });
+
+  describe('detectTodoStubs', () => {
+    it('returns empty array when git command fails', () => {
+      const result = detectTodoStubs('/nonexistent-path');
+      expect(result).toEqual([]);
     });
   });
 

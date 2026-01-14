@@ -16,6 +16,7 @@ import {
   emitStuck,
   emitComplete,
   emitFailed,
+  emitWarning,
 } from './headless-emitter.js';
 
 export interface HeadlessRunOptions {
@@ -73,6 +74,51 @@ export function getTotalTaskCount(cwd: string): number {
   const content = readFileSync(specPath, 'utf-8');
   const allTasks = content.match(/^-\s*\[[x\s]\]\s+/gim);
   return allTasks ? allTasks.length : 0;
+}
+
+const TODO_PATTERNS = [
+  /\/\/\s*TODO:/i,
+  /\/\/\s*FIXME:/i,
+  /#\s*TODO:/i,
+  /#\s*FIXME:/i,
+  /throw new Error\(['"]Not implemented/i,
+  /raise NotImplementedError/i,
+];
+
+export function detectTodoStubs(cwd: string): string[] {
+  const filesWithStubs: string[] = [];
+
+  try {
+    const { execSync } = require('child_process');
+    const gitDiff = execSync('git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD', {
+      cwd,
+      encoding: 'utf-8',
+    });
+
+    const changedFiles = gitDiff
+      .split('\n')
+      .filter((f: string) => f.trim())
+      .filter((f: string) => /\.(ts|tsx|js|jsx|py)$/.test(f));
+
+    for (const file of changedFiles) {
+      const filePath = join(cwd, file);
+      if (!existsSync(filePath)) continue;
+
+      try {
+        const content = readFileSync(filePath, 'utf-8');
+        const hasTodo = TODO_PATTERNS.some((pattern) => pattern.test(content));
+        if (hasTodo) {
+          filesWithStubs.push(file);
+        }
+      } catch {
+        continue;
+      }
+    }
+  } catch {
+    return [];
+  }
+
+  return filesWithStubs;
 }
 
 export async function runSingleIteration(
@@ -238,6 +284,17 @@ export async function executeHeadlessRun(
 
     for (let j = 0; j < newlyCompleted.length; j++) {
       emitTaskComplete(lastCompletedCount + j + 1, newlyCompleted[j]);
+    }
+
+    if (newlyCompleted.length > 0) {
+      const filesWithStubs = detectTodoStubs(options.cwd);
+      if (filesWithStubs.length > 0) {
+        emitWarning(
+          'todo_stub',
+          'Completed tasks contain TODO/FIXME stubs',
+          filesWithStubs
+        );
+      }
     }
 
     if (tasksAfter.length > tasksBefore.length) {

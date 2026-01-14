@@ -260,6 +260,36 @@ Before starting work in a Ralph loop:
 
 Lazy load context. SPEC has the tasks; only read progress/index if you need to verify state.
 
+### Integration Verification
+
+When building code that integrates with existing systems:
+
+1. **Read existing code first** - Don't assume API shapes or response formats
+2. **Check shared types** - Use existing type definitions, don't create duplicates
+3. **Verify at runtime** - Test against real endpoints when possible
+
+**Example:**
+```
+SPEC says: "Add client for /api/status"
+
+WRONG: Assume response is { workers: [], status: "ok" }
+RIGHT: Read the server code to find actual response type
+```
+
+Common integration mistakes:
+- Building against imagined APIs that don't match the real server
+- Creating new types when shared types already exist
+- Assuming request/response shapes without reading existing handlers
+
+**Before implementing any integration:**
+```bash
+# Find the actual endpoint handler
+grep -r "app.get('/api/status" src/
+
+# Find existing types
+grep -r "interface.*Response" src/types/
+```
+
 ### Creating SPECs (Interactive)
 
 When a user wants to create a new SPEC, **interview them** to gather requirements before writing it:
@@ -355,6 +385,73 @@ When generating a SPEC, optimize for **iteration efficiency**. Each checkbox = o
 - Be specific about scope: "Create activity feed components" not "Build UI"
 - Include file hints when helpful
 
+**Include verification steps:**
+
+```markdown
+## Phase 2: Core Features
+- [ ] Implement authentication system
+  - POST /auth/register - create user with hashed password
+  - POST /auth/login - validate credentials, return JWT
+  - POST /auth/logout - invalidate token
+  - Middleware for protected routes
+  - Tests for all auth flows
+
+  **Verify:**
+  - `curl -X POST localhost:3000/auth/register -d '{"email":"test@test.com","password":"test123"}'` → 201
+  - `curl -X POST localhost:3000/auth/login -d '{"email":"test@test.com","password":"test123"}'` → returns JWT
+  - Use JWT on protected route → 200
+
+- [ ] Build posts API with full CRUD
+  - GET/POST/PUT/DELETE endpoints
+  - Authorization (only author can edit/delete)
+  - Pagination for list endpoint
+  - Tests for all operations
+
+  **Verify:**
+  - `curl localhost:3000/posts` → 200 with array
+  - Create post with valid JWT → 201
+  - Edit post as non-author → 403
+```
+
+### Verification Steps
+
+Each task should include a **Verify:** section with concrete checks to run before marking complete.
+
+**Good verification steps:**
+- API calls with expected response codes
+- CLI commands with expected output
+- Database queries to confirm data was written
+- File existence checks
+
+**Verification format:**
+```
+**Verify:**
+- `<command>` → <expected result>
+- `<command>` → <expected result>
+```
+
+**Examples:**
+```markdown
+**Verify:**
+- `npm test` → all tests pass
+- `curl localhost:3000/health` → 200
+- `ls dist/` → contains index.js
+- `node dist/cli.js --version` → prints version number
+```
+
+If verification can't run (server not available, etc.), note this in the commit and leave the checkbox unchecked.
+
+### The Loop
+
+Each iteration, Ralph:
+1. Reads SPEC.md to find the next incomplete task
+2. Writes a plan to `.ai/ralph/plan.md`
+3. Implements the task with tests
+4. **Runs verification steps from the Verify section**
+5. **Only marks checkbox if verification passes**
+6. Commits changes
+7. Updates STATE.txt and `.ai/ralph/index.md`
+
 ### Memory System (.ai/ralph/)
 
 Ralph uses commit-anchored memory to maintain context efficiently.
@@ -418,6 +515,25 @@ A task is ONLY complete when:
 - [ ] No linting errors
 - [ ] Documentation updated (if public API)
 - [ ] Changes committed with clear message
+
+**A task is NOT complete if:**
+- Code contains `// TODO:` or `// FIXME:` comments
+- Implementation is stubbed or placeholder
+- Tests don't pass or are skipped
+- Functions throw "not implemented" errors
+
+**If you can't implement something:**
+1. Leave the checkbox unchecked
+2. Document the blocker in STATE.txt
+3. Move to the next task or create a sub-task for the blocker
+
+**Example of incomplete code (don't mark as done):**
+```typescript
+async function processPayment(amount: number): Promise<void> {
+  // TODO: implement payment processing
+  throw new Error('Not implemented');
+}
+```
 
 ### Progress Updates
 When updating `STATE.txt`, be specific:
@@ -516,6 +632,13 @@ pylint src/
 mypy src/
 pytest --cov=src --cov-fail-under=80
 ```
+
+## Tips
+
+- **Write verify steps**: Tasks without verification may be marked complete without actually working
+- **Test locally first**: If verification needs a running server, start it before Ralph runs
+- **Keep verify steps simple**: One command, one expected result
+- **Fail fast**: Put the most likely-to-fail verification first
 
 ## Philosophical Principles
 

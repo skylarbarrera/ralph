@@ -55,6 +55,13 @@ export interface FailedEvent {
   error: string;
 }
 
+export interface WarningEvent {
+  event: 'warning';
+  type: 'todo_stub' | 'quality';
+  message: string;
+  files?: string[];
+}
+
 export type RalphEvent =
   | StartedEvent
   | IterationEvent
@@ -64,7 +71,8 @@ export type RalphEvent =
   | IterationDoneEvent
   | StuckEvent
   | CompleteEvent
-  | FailedEvent;
+  | FailedEvent
+  | WarningEvent;
 
 export function emit(event: RalphEvent): void {
   console.log(JSON.stringify(event));
@@ -109,4 +117,8 @@ export function emitComplete(tasks_done: number, total_duration_ms: number): voi
 
 export function emitFailed(error: string): void {
   emit({ event: 'failed', error });
+}
+
+export function emitWarning(type: 'todo_stub' | 'quality', message: string, files?: string[]): void {
+  emit({ event: 'warning', type, message, files });
 }

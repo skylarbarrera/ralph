@@ -147,7 +147,7 @@ function main(): void {
   program
     .name('ralph')
     .description('Autonomous AI coding loops')
-    .version('0.3.0');
+    .version('0.3.1');
 
   program
     .command('init')
