@@ -43,6 +43,7 @@ export interface RunOptions {
   noBranch: boolean;
   headless: boolean;
   stuckThreshold: number;
+  model?: string;
 }
 
 export type CliOptions = RunOptions;
@@ -101,6 +102,7 @@ export function executeRun(options: RunOptions): void {
       cwd={options.cwd}
       idleTimeoutMs={idleTimeoutMs}
       saveJsonl={options.saveJsonl}
+      model={options.model}
     />
   );
 
@@ -133,6 +135,7 @@ export async function executeHeadlessRun(options: RunOptions): Promise<void> {
     stuckThreshold: options.stuckThreshold,
     idleTimeoutMs: options.timeoutIdle * 1000,
     saveJsonl: options.saveJsonl,
+    model: options.model,
   });
 
   process.exit(exitCode);
@@ -195,6 +198,7 @@ function main(): void {
     .option('--no-branch', 'Skip feature branch creation')
     .option('--headless', 'Output JSON events instead of UI')
     .option('--stuck-threshold <n>', 'Iterations without progress before stuck (headless)', '3')
+    .option('-m, --model <name>', 'Claude model to use (sonnet, opus, haiku)', 'sonnet')
     .action((opts) => {
       let iterations = parseInt(opts.iterations, 10);
       const all = opts.all ?? false;
@@ -217,6 +221,7 @@ function main(): void {
         noBranch: opts.branch === false,
         headless: opts.headless ?? false,
         stuckThreshold: parseInt(opts.stuckThreshold, 10),
+        model: opts.model,
       };
 
       if (options.headless) {
@@ -268,6 +273,7 @@ function main(): void {
     .option('--cwd <path>', 'Working directory', process.cwd())
     .option('--headless', 'Output JSON events instead of UI', false)
     .option('--timeout <seconds>', 'Timeout for generation', '300')
+    .option('-m, --model <name>', 'Claude model to use (sonnet, opus, haiku)', 'opus')
     .action(async (description: string, opts) => {
       const cwd = resolve(opts.cwd);
 
@@ -276,6 +282,7 @@ function main(): void {
         cwd,
         headless: opts.headless ?? false,
         timeoutMs: parseInt(opts.timeout, 10) * 1000,
+        model: opts.model,
       });
 
       if (!result.success) {

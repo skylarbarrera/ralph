@@ -25,6 +25,7 @@ export interface HeadlessRunOptions {
   stuckThreshold: number;
   idleTimeoutMs: number;
   saveJsonl?: string;
+  model?: string;
 }
 
 export interface IterationResult {
@@ -165,6 +166,7 @@ export async function runSingleIteration(
       '--output-format',
       'stream-json',
       '--verbose',
+      ...(options.model ? ['--model', options.model] : []),
       '-p',
       options.prompt,
     ];

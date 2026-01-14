@@ -33,6 +33,7 @@ export interface AppProps {
   cwd?: string;
   idleTimeoutMs?: number;
   saveJsonl?: string | boolean;
+  model?: string;
   _mockState?: ClaudeStreamState;
   onIterationComplete?: (result: IterationResult) => void;
   completedResults?: IterationResult[];
@@ -48,6 +49,7 @@ export function App({
   cwd,
   idleTimeoutMs,
   saveJsonl,
+  model,
   _mockState,
   onIterationComplete,
   completedResults = [],
@@ -62,6 +64,7 @@ export function App({
     cwd,
     idleTimeoutMs,
     saveJsonl,
+    model,
   };
 
   const liveState = useClaudeStream(streamOptions);
@@ -120,6 +123,7 @@ export interface IterationRunnerProps {
   cwd?: string;
   idleTimeoutMs?: number;
   saveJsonl?: string | boolean;
+  model?: string;
   _mockResults?: IterationResult[];
   _mockCurrentIteration?: number;
   _mockIsComplete?: boolean;
@@ -170,6 +174,7 @@ export function IterationRunner({
   cwd,
   idleTimeoutMs,
   saveJsonl,
+  model,
   _mockResults,
   _mockCurrentIteration,
   _mockIsComplete,
@@ -308,6 +313,7 @@ export function IterationRunner({
       cwd={cwd}
       idleTimeoutMs={idleTimeoutMs}
       saveJsonl={saveJsonl}
+      model={model}
       onIterationComplete={handleIterationComplete}
       _mockState={_mockState}
       completedResults={results}

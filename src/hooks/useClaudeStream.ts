@@ -24,6 +24,7 @@ export interface UseClaudeStreamOptions {
   saveJsonl?: string | boolean;
   iteration?: number;
   totalIterations?: number;
+  model?: string;
   _spawnFn?: SpawnFn;
 }
 
@@ -51,6 +52,7 @@ export function useClaudeStream(options: UseClaudeStreamOptions): ClaudeStreamSt
     saveJsonl,
     iteration = 1,
     totalIterations = 1,
+    model,
     _spawnFn = spawn,
   } = options;
 
@@ -172,6 +174,7 @@ export function useClaudeStream(options: UseClaudeStreamOptions): ClaudeStreamSt
       '--output-format',
       'stream-json',
       '--verbose',
+      ...(model ? ['--model', model] : []),
       '-p',
       prompt,
     ];
@@ -255,7 +258,7 @@ export function useClaudeStream(options: UseClaudeStreamOptions): ClaudeStreamSt
         loggerRef.current.close();
       }
     };
-  }, [prompt, cwd, idleTimeoutMs, saveJsonl, iteration, totalIterations, _spawnFn, resetIdleTimer, updateStateFromMachine]);
+  }, [prompt, cwd, idleTimeoutMs, saveJsonl, iteration, totalIterations, model, _spawnFn, resetIdleTimer, updateStateFromMachine]);
 
   return state;
 }

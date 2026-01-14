@@ -8,6 +8,7 @@ export interface SpecGeneratorOptions {
   cwd: string;
   headless: boolean;
   timeoutMs: number;
+  model?: string;
 }
 
 export interface SpecGeneratorResult {
@@ -127,6 +128,7 @@ export async function generateSpec(options: SpecGeneratorOptions): Promise<SpecG
       '--output-format',
       'stream-json',
       '--verbose',
+      ...(options.model ? ['--model', options.model] : []),
       '-p',
       prompt,
     ];
