@@ -31,8 +31,16 @@ Create a SPEC.md file based on this project description:
 ## Process
 
 1. **Analyze the description** - Understand what's being requested
-2. **Research if needed** - Use Glob/Grep to check existing code patterns if this is a brownfield project
-3. **Design the tasks** - Break down into logical phases and tasks
+2. **Explore the codebase FIRST** - Before designing tasks, understand what exists:
+   - Run \`ls\` and \`tree\` to see project structure
+   - Use Glob to find relevant files (e.g., \`**/*.ts\`, \`**/routes/*\`)
+   - Read key files to understand existing patterns, conventions, and architecture
+   - Identify what can be reused vs. what needs to be created
+   - Note how similar features are implemented
+3. **Design tasks that integrate** - Tasks should fit with existing code:
+   - Follow existing naming conventions
+   - Use existing shared utilities/types
+   - Match existing patterns (e.g., if all routes are in /routes, new ones go there too)
 4. **Write SPEC.md** - Create the spec file following the rules below
 5. **Validate** - Ensure the spec follows conventions
 
