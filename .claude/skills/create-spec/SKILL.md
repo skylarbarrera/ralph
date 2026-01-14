@@ -140,6 +140,28 @@ SPECs describe **requirements**, not solutions.
   - Handle comparison errors gracefully
 ```
 
+### Verification Steps
+
+Each task SHOULD include a **Verify:** section with concrete checks:
+
+```markdown
+- [ ] Implement authentication system
+  - POST /auth/register - create user with hashed password
+  - POST /auth/login - validate credentials, return JWT
+  - Tests for all auth flows
+
+  **Verify:**
+  - `curl -X POST localhost:3000/auth/register -d '{"email":"test@test.com","password":"test123"}'` → 201
+  - `curl -X POST localhost:3000/auth/login -d '{"email":"test@test.com","password":"test123"}'` → returns JWT
+  - `npm test` → all tests pass
+```
+
+Good verification steps:
+- API calls with expected response codes
+- CLI commands with expected output
+- File existence checks (`ls dist/` → contains index.js)
+- Test commands (`npm test` → all pass)
+
 ## Step 3: Review with LLM
 
 After generating the spec, spawn a review agent to check for violations:
