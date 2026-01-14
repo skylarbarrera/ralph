@@ -8,23 +8,14 @@ import { StatusBar } from './components/StatusBar.js';
 import { CompletedIterationsList } from './components/CompletedIterationsList.js';
 import { useClaudeStream, type UseClaudeStreamOptions, type ClaudeStreamState } from './hooks/useClaudeStream.js';
 import { join } from 'path';
-import type { Stats } from './lib/state-machine.js';
-import type { LastCommit } from './lib/types.js';
+import type { UIIterationResult, Stats } from './lib/types.js';
 import { loadSpecFromDir, getTaskForIteration, isSpecComplete, type SpecStructure } from './lib/spec-parser.js';
 
-export interface IterationResult {
-  iteration: number;
-  durationMs: number;
-  stats: Stats;
-  error: Error | null;
-  taskText: string | null;
-  specTaskText: string | null;
-  lastCommit: LastCommit | null;
-  costUsd: number | null;
-  usage: { inputTokens: number; outputTokens: number } | null;
-  taskNumber: string | null;
-  phaseName: string | null;
-}
+// Alias for backwards compatibility and shorter local usage
+type IterationResult = UIIterationResult;
+
+// Re-export for external consumers
+export type { UIIterationResult as IterationResult } from './lib/types.js';
 
 export interface AppProps {
   prompt: string;

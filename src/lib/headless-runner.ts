@@ -2,10 +2,11 @@ import { spawn, type ChildProcess, type SpawnOptionsWithoutStdio } from 'child_p
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { StreamParser } from './stream-parser.js';
-import { StateMachine, type Stats } from './state-machine.js';
+import { StateMachine } from './state-machine.js';
 import { JsonlLogger } from './logger.js';
 import { isSpecComplete } from './spec-parser.js';
 import { getToolCategory } from './tool-categories.js';
+import type { HeadlessIterationResult } from './types.js';
 import {
   emitStarted,
   emitIteration,
@@ -29,14 +30,8 @@ export interface HeadlessRunOptions {
   model?: string;
 }
 
-export interface IterationResult {
-  iteration: number;
-  durationMs: number;
-  stats: Stats;
-  error?: Error;
-  commitHash?: string;
-  commitMessage?: string;
-}
+// Re-export for backwards compatibility
+export type { HeadlessIterationResult as IterationResult } from './types.js';
 
 export type SpawnFn = (
   command: string,
@@ -126,7 +121,7 @@ export async function runSingleIteration(
   iteration: number,
   totalIterations: number,
   _spawnFn: SpawnFn = spawn
-): Promise<IterationResult> {
+): Promise<HeadlessIterationResult> {
   return new Promise((resolve) => {
     const startTime = Date.now();
     const machine = new StateMachine(iteration, totalIterations);

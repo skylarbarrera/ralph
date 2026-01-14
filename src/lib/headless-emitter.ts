@@ -1,4 +1,4 @@
-import type { Stats } from './state-machine.js';
+import type { Stats } from './types.js';
 
 export interface StartedEvent {
   event: 'started';

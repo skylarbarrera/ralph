@@ -141,3 +141,40 @@ export interface LastCommit {
   hash: string;
   message: string;
 }
+
+// Tool usage statistics tracked during iteration
+export interface Stats {
+  toolsStarted: number;
+  toolsCompleted: number;
+  toolsErrored: number;
+  reads: number;
+  writes: number;
+  commands: number;
+  metaOps: number;
+}
+
+// Base interface for iteration results - shared between UI and headless modes
+export interface BaseIterationResult {
+  iteration: number;
+  durationMs: number;
+  stats: Stats;
+}
+
+// UI-specific iteration result (App.tsx)
+export interface UIIterationResult extends BaseIterationResult {
+  error: Error | null;
+  taskText: string | null;
+  specTaskText: string | null;
+  lastCommit: LastCommit | null;
+  costUsd: number | null;
+  usage: { inputTokens: number; outputTokens: number } | null;
+  taskNumber: string | null;
+  phaseName: string | null;
+}
+
+// Headless-specific iteration result (headless-runner.ts)
+export interface HeadlessIterationResult extends BaseIterationResult {
+  error?: Error;
+  commitHash?: string;
+  commitMessage?: string;
+}

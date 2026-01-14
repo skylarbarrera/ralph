@@ -5,6 +5,7 @@ import type {
   ResultEvent,
   ActivityItem,
   LastCommit,
+  Stats,
 } from './types.js';
 import {
   type ToolCategory,
@@ -12,6 +13,7 @@ import {
   getCategoryVerb,
   getToolDisplayName,
 } from './tool-categories.js';
+import { ACTIVITY_LOG_LIMITS, TRUNCATION_LIMITS } from './config.js';
 
 export type Phase = 'idle' | 'reading' | 'editing' | 'running' | 'thinking' | 'done';
 
@@ -41,15 +43,8 @@ export interface ToolGroup {
   totalDurationMs: number;
 }
 
-export interface Stats {
-  toolsStarted: number;
-  toolsCompleted: number;
-  toolsErrored: number;
-  reads: number;
-  writes: number;
-  commands: number;
-  metaOps: number;
-}
+// Re-export Stats from types.ts for backwards compatibility
+export type { Stats } from './types.js';
 
 export interface IterationState {
   iteration: number;
@@ -91,7 +86,6 @@ function phaseFromCategory(category: ToolCategory): Phase {
   }
 }
 
-const MAX_ACTIVITY_LOG_SIZE = 50;
 
 export function isGitCommitCommand(command: string): boolean {
   const trimmed = command.trim();
@@ -137,7 +131,7 @@ export class StateMachine {
 
   private addActivityItem(item: ActivityItem): void {
     this.state.activityLog.push(item);
-    if (this.state.activityLog.length > MAX_ACTIVITY_LOG_SIZE) {
+    if (this.state.activityLog.length > ACTIVITY_LOG_LIMITS.MACHINE_BUFFER) {
       this.state.activityLog.shift();
     }
   }
@@ -145,7 +139,7 @@ export class StateMachine {
   handleText(event: TextEvent): void {
     const trimmedText = event.text.trim();
     if (this.state.taskText === null) {
-      this.state.taskText = trimmedText.slice(0, 100);
+      this.state.taskText = trimmedText.slice(0, TRUNCATION_LIMITS.TASK_TEXT);
     }
     if (trimmedText) {
       this.addActivityItem({

@@ -1,3 +1,5 @@
+import { TRUNCATION_LIMITS } from './config.js';
+
 export type ToolCategory = 'read' | 'write' | 'command' | 'meta';
 
 export type ToolState = 'active' | 'done' | 'error';
@@ -72,14 +74,16 @@ export function getToolDisplayName(toolName: string, input?: ToolInput): string 
   }
   if (toolName === 'Bash' && typeof input.command === 'string') {
     const cmd = input.command.split(' ')[0] || '';
-    return cmd.length > 20 ? cmd.slice(0, 20) + '...' : cmd || toolName;
+    const maxLen = TRUNCATION_LIMITS.TOOL_DISPLAY_NAME;
+    return cmd.length > maxLen ? cmd.slice(0, maxLen) + '...' : cmd || toolName;
   }
   if (toolName === 'Glob' && typeof input.pattern === 'string') {
     return input.pattern || toolName;
   }
   if (toolName === 'Grep' && typeof input.pattern === 'string') {
     const pattern = input.pattern || '';
-    return pattern.length > 20 ? pattern.slice(0, 20) + '...' : pattern || toolName;
+    const maxLen = TRUNCATION_LIMITS.TOOL_DISPLAY_NAME;
+    return pattern.length > maxLen ? pattern.slice(0, maxLen) + '...' : pattern || toolName;
   }
   return toolName;
 }
