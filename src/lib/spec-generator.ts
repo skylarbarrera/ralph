@@ -32,6 +32,7 @@ Create a SPEC.md file based on this project description:
 
 1. **Analyze the description** - Understand what's being requested
 2. **Explore the codebase FIRST** - Before designing tasks, understand what exists:
+   - Read README.md, CLAUDE.md, and any docs/*.md for project context
    - Run \`ls\` and \`tree\` to see project structure
    - Use Glob to find relevant files (e.g., \`**/*.ts\`, \`**/routes/*\`)
    - Read key files to understand existing patterns, conventions, and architecture
