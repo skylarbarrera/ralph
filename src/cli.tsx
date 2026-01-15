@@ -272,7 +272,9 @@ function main(): void {
     .argument('<description>', 'What to build (e.g., "REST API for user management")')
     .option('--cwd <path>', 'Working directory', process.cwd())
     .option('--headless', 'Output JSON events instead of UI', false)
+    .option('--auto', 'Autonomous mode with review loop (no user interaction)', false)
     .option('--timeout <seconds>', 'Timeout for generation', '300')
+    .option('--max-attempts <n>', 'Max refinement attempts in autonomous mode', '3')
     .option('-m, --model <name>', 'Claude model to use (sonnet, opus, haiku)', 'opus')
     .action(async (description: string, opts) => {
       const cwd = resolve(opts.cwd);
@@ -281,7 +283,9 @@ function main(): void {
         description,
         cwd,
         headless: opts.headless ?? false,
+        autonomous: opts.auto ?? false,
         timeoutMs: parseInt(opts.timeout, 10) * 1000,
+        maxAttempts: parseInt(opts.maxAttempts, 10),
         model: opts.model,
       });
 

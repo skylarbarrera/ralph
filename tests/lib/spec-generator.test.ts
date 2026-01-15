@@ -3,6 +3,7 @@ import { generateSpec, type SpecGeneratorOptions } from '../../src/lib/spec-gene
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import { Writable, Readable } from 'stream';
+import * as fs from 'fs';
 
 vi.mock('child_process');
 vi.mock('fs');
@@ -145,6 +146,195 @@ describe('spec-generator', () => {
       );
 
       mockProcess.emit('close', 1);
+      await promise;
+    });
+  });
+
+  describe('autonomous mode', () => {
+    beforeEach(() => {
+      // Mock fs functions for autonomous mode
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue('# Test SPEC\n\n- [ ] Task 1');
+    });
+
+    it('runs review loop on generated spec', async () => {
+      const options: SpecGeneratorOptions = {
+        description: 'Build a REST API',
+        cwd: '/test',
+        headless: false,
+        autonomous: true,
+        timeoutMs: 5000,
+        maxAttempts: 3,
+      };
+
+      const promise = generateSpec(options);
+
+      // Wait for initial generation
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // First spawn: initial generation (headless)
+      expect(spawn).toHaveBeenCalledTimes(1);
+      mockProcess.emit('close', 0);
+
+      // Wait for review spawn
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // Second spawn: review-spec
+      expect(spawn).toHaveBeenCalledTimes(2);
+      const reviewCall = vi.mocked(spawn).mock.calls[1];
+      expect(reviewCall[1]).toContain('-p');
+      const reviewPromptIndex = (reviewCall[1] as string[]).indexOf('-p');
+      const reviewPrompt = (reviewCall[1] as string[])[reviewPromptIndex + 1];
+      expect(reviewPrompt).toContain('/review-spec');
+
+      // Simulate review passing
+      mockProcess.stdout.emit('data', Buffer.from('SPEC Review: PASS\n'));
+      mockProcess.emit('close', 0);
+
+      const result = await promise;
+
+      expect(result.success).toBe(true);
+      expect(result.reviewPassed).toBe(true);
+      expect(result.attempts).toBe(1);
+    });
+
+    it('refines spec on review failure', async () => {
+      const options: SpecGeneratorOptions = {
+        description: 'Build a REST API',
+        cwd: '/test',
+        headless: false,
+        autonomous: true,
+        timeoutMs: 5000,
+        maxAttempts: 3,
+      };
+
+      const promise = generateSpec(options);
+
+      // Initial generation
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.emit('close', 0);
+
+      // First review (fail)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.stdout.emit(
+        'data',
+        Buffer.from('SPEC Review: FAIL\n\n## Format Issues\n\n- Bad checkbox syntax')
+      );
+      mockProcess.emit('close', 0);
+
+      // Refinement
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.emit('close', 0);
+
+      // Second review (pass)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.stdout.emit('data', Buffer.from('SPEC Review: PASS\n'));
+      mockProcess.emit('close', 0);
+
+      const result = await promise;
+
+      expect(result.success).toBe(true);
+      expect(result.reviewPassed).toBe(true);
+      expect(result.attempts).toBe(2);
+      expect(spawn).toHaveBeenCalledTimes(4); // gen + review1 + refine + review2
+    });
+
+    it('fails after max attempts without passing review', async () => {
+      const options: SpecGeneratorOptions = {
+        description: 'Build a REST API',
+        cwd: '/test',
+        headless: false,
+        autonomous: true,
+        timeoutMs: 5000,
+        maxAttempts: 2,
+      };
+
+      const promise = generateSpec(options);
+
+      // Initial generation
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.emit('close', 0);
+
+      // First review (fail)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.stdout.emit('data', Buffer.from('SPEC Review: FAIL\n'));
+      mockProcess.emit('close', 0);
+
+      // Refinement
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.emit('close', 0);
+
+      // Second review (fail)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.stdout.emit('data', Buffer.from('SPEC Review: FAIL\n'));
+      mockProcess.emit('close', 0);
+
+      const result = await promise;
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Max attempts');
+      expect(result.reviewPassed).toBe(false);
+      expect(result.attempts).toBe(2);
+    });
+
+    it('parses review output correctly', async () => {
+      const options: SpecGeneratorOptions = {
+        description: 'Build a REST API',
+        cwd: '/test',
+        headless: true,
+        autonomous: true,
+        timeoutMs: 5000,
+        maxAttempts: 3,
+      };
+
+      const promise = generateSpec(options);
+
+      // Initial generation
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.emit('close', 0);
+
+      // Review with detailed feedback
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const reviewOutput = `
+SPEC Review: FAIL
+
+## Format Issues
+
+### Checkbox Syntax
+- Line 42: Uses * [ ] instead of - [ ]
+
+## Content Concerns
+
+### HIGH PRIORITY
+1. Missing Prerequisites: Auth needed first
+
+## Recommendations
+
+1. Fix format violations
+2. Add auth tasks
+`;
+      mockProcess.stdout.emit('data', Buffer.from(reviewOutput));
+      mockProcess.emit('close', 0);
+
+      // Refinement
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const refineCall = vi.mocked(spawn).mock.calls[2];
+      const refineArgs = refineCall[1] as string[];
+      const refinePromptIndex = refineArgs.indexOf('-p');
+      const refinePrompt = refineArgs[refinePromptIndex + 1];
+
+      // Check that concerns are included in refinement prompt
+      expect(refinePrompt).toContain('Format issues found');
+      expect(refinePrompt).toContain('Content concerns');
+      expect(refinePrompt).toContain('Recommendations');
+
+      mockProcess.emit('close', 0);
+
+      // Second review (pass)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      mockProcess.stdout.emit('data', Buffer.from('SPEC Review: PASS\n'));
+      mockProcess.emit('close', 0);
+
       await promise;
     });
   });

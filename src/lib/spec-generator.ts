@@ -7,7 +7,9 @@ export interface SpecGeneratorOptions {
   description: string;
   cwd: string;
   headless: boolean;
+  autonomous?: boolean;
   timeoutMs: number;
+  maxAttempts?: number;
   model?: string;
 }
 
@@ -17,6 +19,8 @@ export interface SpecGeneratorResult {
   taskCount?: number;
   validationPassed?: boolean;
   validationOutput?: string;
+  reviewPassed?: boolean;
+  attempts?: number;
   error?: string;
 }
 
@@ -157,6 +161,11 @@ function emitJson(event: Record<string, unknown>): void {
 }
 
 export async function generateSpec(options: SpecGeneratorOptions): Promise<SpecGeneratorResult> {
+  // Autonomous mode: generate spec with review loop
+  if (options.autonomous) {
+    return generateSpecAutonomous(options);
+  }
+
   // In interactive mode, use the create-spec skill for structured interview
   // In headless mode, use the embedded prompt for autonomous generation
   const useSkill = !options.headless;
@@ -374,4 +383,279 @@ async function generateSpecHeadless(
       });
     });
   });
+}
+
+interface ReviewResult {
+  passed: boolean;
+  concerns: string[];
+  fullOutput: string;
+}
+
+async function runReviewSpec(specPath: string, cwd: string, model?: string): Promise<ReviewResult> {
+  return new Promise((resolve) => {
+    const args = [
+      '--dangerously-skip-permissions',
+      '--output-format',
+      'stream-json',
+      '--verbose',
+      ...(model ? ['--model', model] : []),
+      '-p',
+      `/review-spec ${specPath}`,
+    ];
+
+    const proc = spawn('claude', args, {
+      cwd,
+      env: process.env,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    proc.stdin?.end();
+
+    let output = '';
+
+    proc.stdout?.on('data', (data: Buffer) => {
+      output += data.toString();
+    });
+
+    proc.on('close', () => {
+      // Parse the output to extract PASS/FAIL and concerns
+      const result = parseReviewOutput(output);
+      resolve(result);
+    });
+
+    proc.on('error', () => {
+      resolve({
+        passed: false,
+        concerns: ['Failed to run review-spec skill'],
+        fullOutput: output,
+      });
+    });
+  });
+}
+
+function parseReviewOutput(output: string): ReviewResult {
+  // Look for "SPEC Review: PASS" or "SPEC Review: FAIL" in the output
+  const passMatch = /SPEC Review:\s*PASS/i.test(output);
+  const failMatch = /SPEC Review:\s*FAIL/i.test(output);
+
+  if (passMatch && !failMatch) {
+    return {
+      passed: true,
+      concerns: [],
+      fullOutput: output,
+    };
+  }
+
+  // Extract concerns from the output
+  const concerns: string[] = [];
+
+  // Look for format issues
+  const formatSection = output.match(/## Format Issues\s+([\s\S]*?)(?=##|$)/i);
+  if (formatSection) {
+    concerns.push('Format issues found:\n' + formatSection[1].trim());
+  }
+
+  // Look for content concerns
+  const contentSection = output.match(/## Content Concerns\s+([\s\S]*?)(?=##|$)/i);
+  if (contentSection) {
+    concerns.push('Content concerns:\n' + contentSection[1].trim());
+  }
+
+  // Look for recommendations
+  const recommendationsSection = output.match(/## Recommendations\s+([\s\S]*?)(?=##|$)/i);
+  if (recommendationsSection) {
+    concerns.push('Recommendations:\n' + recommendationsSection[1].trim());
+  }
+
+  return {
+    passed: false,
+    concerns: concerns.length > 0 ? concerns : ['Review failed but no specific concerns extracted'],
+    fullOutput: output,
+  };
+}
+
+async function refineSpec(
+  description: string,
+  currentSpec: string,
+  concerns: string[],
+  cwd: string,
+  model?: string
+): Promise<boolean> {
+  const refinementPrompt = `You previously generated a SPEC.md that has issues. Please revise it based on this feedback:
+
+${concerns.join('\n\n')}
+
+Original Description: ${description}
+
+Current SPEC content:
+${currentSpec}
+
+Generate an improved SPEC.md that addresses all the concerns above. Write the updated SPEC.md to the file.`;
+
+  return new Promise((resolve) => {
+    const args = [
+      '--dangerously-skip-permissions',
+      '--output-format',
+      'stream-json',
+      '--verbose',
+      ...(model ? ['--model', model] : []),
+      '-p',
+      refinementPrompt,
+    ];
+
+    const proc = spawn('claude', args, {
+      cwd,
+      env: process.env,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    proc.stdin?.end();
+
+    proc.on('close', (code) => {
+      const specPath = join(cwd, 'SPEC.md');
+      resolve(code === 0 && existsSync(specPath));
+    });
+
+    proc.on('error', () => {
+      resolve(false);
+    });
+  });
+}
+
+async function generateSpecAutonomous(options: SpecGeneratorOptions): Promise<SpecGeneratorResult> {
+  const maxAttempts = options.maxAttempts ?? 3;
+  const specPath = join(options.cwd, 'SPEC.md');
+
+  if (options.headless) {
+    emitJson({ event: 'autonomous_spec_started', description: options.description, maxAttempts });
+  } else {
+    console.log(`Generating SPEC autonomously: ${options.description}`);
+    console.log(`Max attempts: ${maxAttempts}\n`);
+  }
+
+  // Step 1: Generate initial SPEC
+  if (!options.headless) {
+    console.log('Attempt 1: Generating initial SPEC...');
+  }
+
+  const initialPrompt = SPEC_GENERATION_PROMPT.replace('{DESCRIPTION}', options.description) + HEADLESS_ADDENDUM;
+  const initialResult = await generateSpecHeadless(
+    { ...options, headless: true },
+    initialPrompt
+  );
+
+  if (!initialResult.success) {
+    if (options.headless) {
+      emitJson({ event: 'autonomous_spec_failed', error: initialResult.error, attempts: 1 });
+    }
+    return {
+      ...initialResult,
+      attempts: 1,
+    };
+  }
+
+  // Step 2: Review loop
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (!options.headless) {
+      console.log(`\nAttempt ${attempt}: Running review...`);
+    }
+
+    if (options.headless) {
+      emitJson({ event: 'autonomous_review_started', attempt });
+    }
+
+    const reviewResult = await runReviewSpec(specPath, options.cwd, options.model);
+
+    if (reviewResult.passed) {
+      if (!options.headless) {
+        console.log(`\n✓ Review passed on attempt ${attempt}!`);
+      }
+
+      if (options.headless) {
+        emitJson({ event: 'autonomous_spec_complete', attempts: attempt, reviewPassed: true });
+      }
+
+      return {
+        success: true,
+        specPath,
+        taskCount: initialResult.taskCount,
+        validationPassed: initialResult.validationPassed,
+        reviewPassed: true,
+        attempts: attempt,
+      };
+    }
+
+    if (!options.headless) {
+      console.log(`✗ Review failed on attempt ${attempt}`);
+      console.log('Concerns:');
+      for (const concern of reviewResult.concerns) {
+        console.log(`  - ${concern.split('\n')[0]}`);
+      }
+    }
+
+    if (options.headless) {
+      emitJson({
+        event: 'autonomous_review_failed',
+        attempt,
+        concerns: reviewResult.concerns.length,
+      });
+    }
+
+    // If this was the last attempt, exit with failure
+    if (attempt === maxAttempts) {
+      if (options.headless) {
+        emitJson({
+          event: 'autonomous_spec_failed',
+          error: 'Max attempts reached without passing review',
+          attempts: maxAttempts,
+        });
+      } else {
+        console.log(`\n✗ Failed to generate valid SPEC after ${maxAttempts} attempts`);
+      }
+
+      return {
+        success: false,
+        error: `Max attempts (${maxAttempts}) reached without passing review`,
+        reviewPassed: false,
+        attempts: maxAttempts,
+      };
+    }
+
+    // Refine the SPEC based on concerns
+    if (!options.headless) {
+      console.log(`\nAttempt ${attempt + 1}: Refining SPEC...`);
+    }
+
+    const currentSpec = readFileSync(specPath, 'utf-8');
+    const refined = await refineSpec(
+      options.description,
+      currentSpec,
+      reviewResult.concerns,
+      options.cwd,
+      options.model
+    );
+
+    if (!refined) {
+      if (options.headless) {
+        emitJson({
+          event: 'autonomous_spec_failed',
+          error: 'Refinement failed',
+          attempts: attempt + 1,
+        });
+      }
+
+      return {
+        success: false,
+        error: 'Failed to refine SPEC',
+        attempts: attempt + 1,
+      };
+    }
+  }
+
+  // Should never reach here, but TypeScript needs a return
+  return {
+    success: false,
+    error: 'Unexpected error in autonomous generation',
+    attempts: maxAttempts,
+  };
 }
