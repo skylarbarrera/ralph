@@ -437,3 +437,13 @@
   - Clear PASS/FAIL/ERROR reporting with actionable details
   - Integration examples for Ralph iteration workflow
   - Tests: 590 passing, type check passes
+  - Commit: 53ab3b7 feat(skills): create verify skill for pre-commit verification
+
+✅ 2026-01-15: Updated ralph spec command to support interactive mode
+  - Modified src/lib/spec-generator.ts to use /create-spec skill in interactive mode
+  - Interactive mode (default): Uses skill with AskUserQuestion for structured interviews
+  - Headless mode: Uses embedded prompt for autonomous generation
+  - Created tests/lib/spec-generator.test.ts with 3 comprehensive tests
+  - Tests mock process.stdin and child_process.spawn for isolated testing
+  - Tests: 593 passing (3 new), type check passes
+  - Commit: f332846 feat(spec): add interactive mode with create-spec skill

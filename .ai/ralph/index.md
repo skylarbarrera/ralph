@@ -319,3 +319,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 590 passing
 - notes: Auto-detects project type from config files; zero configuration required; runs tests, type checking, linting based on available tools; supports TypeScript, Python, Go, Rust, Ruby; clear PASS/FAIL/ERROR reporting; integration guidance for Ralph iteration workflow
 - next: Phase 4 - Update ralph spec command to support interactive mode
+
+## f332846 — feat(spec): add interactive mode with create-spec skill
+- files: src/lib/spec-generator.ts, tests/lib/spec-generator.test.ts, .ai/ralph/plan.md
+- tests: 593 passing (3 new tests for spec-generator)
+- notes: Modified generateSpec() to use /create-spec skill in interactive mode (default) for structured interviews with AskUserQuestion; headless mode still uses embedded prompt for autonomous generation; added comprehensive tests with mocking for process.stdin and child_process.spawn
+- next: Phase 5 - Add autonomous spec mode for ralph spec --auto or --headless

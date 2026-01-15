@@ -45,7 +45,7 @@ Ralph is a working CLI with:
 
 ### Phase 4: Interactive Spec Mode
 
-- [ ] Update `ralph spec` command to support interactive mode
+- [x] Update `ralph spec` command to support interactive mode
   - Default behavior: interactive interview with AskUserQuestion
   - User is present, Claude interviews user, asks clarifying questions
   - User provides answers, reviews output, can request changes before finalizing
