@@ -1,0 +1,89 @@
+import { TRUNCATION_LIMITS } from './config.js';
+
+export type ToolCategory = 'read' | 'write' | 'command' | 'meta';
+
+export type ToolState = 'active' | 'done' | 'error';
+
+export const TOOL_CATEGORIES: Record<string, ToolCategory> = {
+  Read: 'read',
+  Grep: 'read',
+  Glob: 'read',
+  WebFetch: 'read',
+  WebSearch: 'read',
+  LSP: 'read',
+  Edit: 'write',
+  Write: 'write',
+  NotebookEdit: 'write',
+  Bash: 'command',
+  TodoWrite: 'meta',
+  Task: 'meta',
+  AskUserQuestion: 'meta',
+  EnterPlanMode: 'meta',
+  ExitPlanMode: 'meta',
+};
+
+export const CATEGORY_ICONS: Record<ToolCategory, string> = {
+  read: '◐',
+  write: '✎',
+  command: '⚡',
+  meta: '○',
+};
+
+export const STATE_ICONS: Record<ToolState, string> = {
+  active: '◐',
+  done: '✓',
+  error: '✗',
+};
+
+export const CATEGORY_VERBS: Record<ToolCategory, string> = {
+  read: 'Reading',
+  write: 'Editing',
+  command: 'Running',
+  meta: 'Processing',
+};
+
+export function getToolCategory(toolName: string): ToolCategory {
+  return TOOL_CATEGORIES[toolName] ?? 'meta';
+}
+
+export function getToolIcon(category: ToolCategory, state: ToolState = 'active'): string {
+  if (state === 'done') return STATE_ICONS.done;
+  if (state === 'error') return STATE_ICONS.error;
+  return CATEGORY_ICONS[category];
+}
+
+export function getCategoryVerb(category: ToolCategory): string {
+  return CATEGORY_VERBS[category];
+}
+
+export interface ToolInput {
+  file_path?: string;
+  command?: string;
+  pattern?: string;
+  [key: string]: unknown;
+}
+
+const FILE_PATH_TOOLS = ['Read', 'Edit', 'Write'];
+
+export function getToolDisplayName(toolName: string, input?: ToolInput): string {
+  if (!input) return toolName;
+
+  if (FILE_PATH_TOOLS.includes(toolName) && typeof input.file_path === 'string') {
+    const fileName = input.file_path.split('/').pop();
+    return fileName || toolName;
+  }
+  if (toolName === 'Bash' && typeof input.command === 'string') {
+    const cmd = input.command.split(' ')[0] || '';
+    const maxLen = TRUNCATION_LIMITS.TOOL_DISPLAY_NAME;
+    return cmd.length > maxLen ? cmd.slice(0, maxLen) + '...' : cmd || toolName;
+  }
+  if (toolName === 'Glob' && typeof input.pattern === 'string') {
+    return input.pattern || toolName;
+  }
+  if (toolName === 'Grep' && typeof input.pattern === 'string') {
+    const pattern = input.pattern || '';
+    const maxLen = TRUNCATION_LIMITS.TOOL_DISPLAY_NAME;
+    return pattern.length > maxLen ? pattern.slice(0, maxLen) + '...' : pattern || toolName;
+  }
+  return toolName;
+}

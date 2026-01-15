@@ -1,0 +1,414 @@
+# Progress Tracker
+# Ralph appends completed tasks here after each iteration.
+# This file helps Ralph understand what's been done and what's next.
+
+✅ 2026-01-08: Implemented JSONL stream parser
+  - Created src/lib/types.ts with TypeScript types for Claude messages and events
+  - Created src/lib/stream-parser.ts with EventEmitter-based parser
+  - Handles system, assistant, user, result envelope types
+  - Emits init, tool_start, tool_end, text, result events
+  - Correlates tool_use.id with tool_result.tool_use_id
+  - Supports chunk-based parsing with buffering
+  - Tests: 25 passing (95% coverage)
+  - Commit: ca9595d feat(parser): add JSONL stream parser for Claude output
+
+✅ 2026-01-08: Implemented state machine for iteration tracking
+  - Created src/lib/state-machine.ts with StateMachine class
+  - Tracks phases: idle, reading, editing, running, thinking, done
+  - Categorizes tools: read (Read/Grep/Glob), write (Edit/Write), command (Bash), meta (TodoWrite/Task)
+  - Coalesces consecutive tools of same category into groups
+  - Generates display summaries (e.g., "Reading file.ts", "Editing 3 items")
+  - Tracks stats: toolsStarted, toolsCompleted, toolsErrored, reads, writes, commands, metaOps
+  - Tests: 41 passing (97% coverage)
+  - Commit: 39c2e45 feat(state): add state machine for iteration tracking
+
+✅ 2026-01-08: Added tool-categories module for configurable tool mapping
+  - Created src/lib/tool-categories.ts with ToolCategory type and mappings
+  - Icons: ◐ read, ✎ write, ⚡ command, ○ meta, ✓ done, ✗ error
+  - Exports: TOOL_CATEGORIES, getToolCategory, getToolIcon, getCategoryVerb, getToolDisplayName
+  - Refactored state-machine.ts to import from tool-categories.ts (removed duplication)
+  - Tests: 30 passing (100% coverage)
+  - Commit: 802598d feat(tools): add tool-categories module for configurable tool mapping
+
+✅ 2026-01-08: Added JSONL logger for raw output tee to disk
+  - Created src/lib/logger.ts with JsonlLogger class
+  - Writes to ./runs/{ISO-timestamp}.jsonl files
+  - Auto-creates runs directory if needed
+  - Supports raw line logging (log) and object logging (logObject)
+  - Gracefully handles close and circular reference errors
+  - Tests: 18 passing (100% coverage)
+  - Commit: e14a41b feat(logger): add JSONL logger for raw output tee to disk
+
+✅ 2026-01-08: Created IterationHeader Ink component
+  - Created src/components/IterationHeader.tsx - first terminal UI component
+  - Displays iteration progress: `┌─ Iteration 1/10 ──── 0:42 elapsed`
+  - formatElapsedTime helper handles seconds, minutes:seconds, hours:minutes:seconds
+  - Added ink-testing-library for component testing
+  - Tests: 13 passing
+  - Commit: 3397c6f feat(ui): add IterationHeader Ink component
+
+✅ 2026-01-08: Created TaskTitle Ink component
+  - Created src/components/TaskTitle.tsx - displays task description
+  - Shows first assistant text with play icon: `│ ▶ "Implementing JWT..."`
+  - truncateText helper with configurable maxLength (default 60)
+  - Handles empty/undefined text gracefully
+  - Tests: 16 passing
+  - Commit: 95171c4 feat(ui): add TaskTitle Ink component
+
+✅ 2026-01-08: Created ToolItem Ink component
+  - Created src/components/ToolItem.tsx - displays single tool status
+  - Shows spinner for active tools, checkmark/error icon for completed
+  - Category-based verb (Reading, Editing, Running, Processing)
+  - Duration formatted in seconds with one decimal (e.g., 0.8s)
+  - Color-coded icons per category and state
+  - Tests: 18 passing
+  - Commit: 8455922 feat(ui): add ToolItem Ink component
+
+✅ 2026-01-08: Created ToolList Ink component
+  - Created src/components/ToolList.tsx - coalesced tool display
+  - Shows completed groups: "✓ Read 3 files (1.2s)"
+  - Shows active tools individually with spinner
+  - Error icon when group contains errors
+  - Proper noun pluralization (file/files, command/commands)
+  - Tests: 19 passing
+  - Commit: 7bc8921 feat(ui): add ToolList Ink component
+
+✅ 2026-01-08: Created StatusBar Ink component
+  - Created src/components/StatusBar.tsx - bottom status bar
+  - Displays phase label (Waiting..., Reading..., Editing..., Running..., Thinking..., Done)
+  - Shows elapsed time in format matching IterationHeader
+  - Supports custom summary text override
+  - Visual style matches header: `└─ Done (2:14) ───────────`
+  - Tests: 20 passing
+  - Commit: cfc6f79 feat(ui): add StatusBar Ink component
+
+✅ 2026-01-08: Created useClaudeStream React hook
+  - Created src/hooks/useClaudeStream.ts - custom hook for claude process management
+  - Spawns claude with --dangerously-skip-permissions --output-format stream-json -p
+  - Parses JSONL stream using StreamParser, updates StateMachine
+  - Returns reactive state: { phase, taskText, activeTools, toolGroups, stats, result, error, isRunning }
+  - Handles idle timeout (kills process after N seconds of no output)
+  - Cleans up process on unmount
+  - Supports JSONL logging via saveJsonl option
+  - Tests: 15 passing (integration tests for parser+machine combo)
+  - Commit: c225b44 feat(hooks): add useClaudeStream React hook
+
+✅ 2026-01-08: Created App.tsx main Ink component
+  - Created src/App.tsx - composes all UI components into main App
+  - Integrates IterationHeader, TaskTitle, ToolList, StatusBar
+  - Uses useClaudeStream hook for state management
+  - Shows error messages when present
+  - _mockState prop enables testing without spawning claude process
+  - Tests: 22 passing
+  - Commit: d1d9da8 feat(ui): add App.tsx main Ink component
+
+✅ 2026-01-08: Created CLI entry point with commander
+  - Created src/cli.tsx - entry point with commander argument parsing
+  - Options: -n/--iterations, -p/--prompt, --prompt-file, --cwd, --timeout-idle, --save-jsonl, --quiet, --title
+  - DEFAULT_PROMPT contains Ralph loop instructions
+  - resolvePrompt() handles priority: direct prompt > file > default
+  - run() renders Ink App with parsed options
+  - Graceful shutdown on SIGINT/SIGTERM
+  - Tests: 17 passing
+  - Commit: b8fa540 feat(cli): add CLI entry point with commander
+
+✅ 2026-01-08: Implemented iteration loop and final summary
+  - Added IterationRunner component to manage sequential iteration execution
+  - Tracks iteration results with per-iteration stats (duration, tool counts, error state)
+  - Aggregates stats across all iterations for summary display
+  - Final summary shows: success/failure counts, total duration, aggregated tool stats
+  - Per-iteration results list with task descriptions, durations, success/error icons
+  - App component now calls onIterationComplete callback when done
+  - CLI updated to use IterationRunner instead of App directly
+  - Tests: 37 passing (was 22 for App.test.tsx)
+  - Commit: fda16d0 feat(app): add iteration loop and final summary display
+
+✅ 2026-01-08: Verified end-to-end CLI with actual claude iteration
+  - Fixed missing --verbose flag (required for stream-json with -p)
+  - Fixed logger to handle full paths in filename option (was doubling "runs/")
+  - Added input field to CompletedTool for better tool display names (shows "package.json" not "Read")
+  - Made getToolDisplayName handle undefined input gracefully
+  - Verified CLI displays: iteration header, task text, tool status, final summary
+  - JSONL logging works correctly
+  - Tests: 268 passing
+  - Commit: 99f0427 fix: add --verbose flag and improve tool display
+
+✅ 2026-01-08: Added activity log and output tracking (Data Layer - Activity Tracking)
+  - Added ActivityItem type with variants: thought, tool_start, tool_complete, commit
+  - Added LastCommit interface for storing commit hash and message
+  - Added output?: string field to CompletedTool for storing tool results
+  - Added activityLog and lastCommit to IterationState
+  - Added addActivityItem() helper with cap at 50 items
+  - Updated handleText, handleToolStart, handleToolEnd to populate activity log
+  - Tests: 277 passing (9 new tests for activity log)
+  - Commit: d409c6f feat(state): add activity log and output tracking
+
+✅ 2026-01-08: Added git commit parsing (Data Layer - Git Commit Parsing)
+  - Added isGitCommitCommand() to detect `git commit` commands
+  - Added parseGitCommitOutput() with regex `/^\[[\w/-]+\s+([a-f0-9]{7,40})\]\s+(.+)$/m`
+  - Integrated into handleToolEnd() - detects Bash git commit commands
+  - Sets lastCommit state when commit is detected
+  - Adds commit activity item to activity log
+  - Tests: 299 passing (22 new tests for git commit parsing)
+  - Commit: 2c49b20 feat(state): add git commit parsing and detection
+
+✅ 2026-01-08: Updated useClaudeStream hook (Hook Updates)
+  - Added activityLog and lastCommit to ClaudeStreamState interface
+  - Imported ActivityItem and LastCommit types from types.ts
+  - Updated initial state to include empty activityLog and null lastCommit
+  - Updated updateStateFromMachine() to sync activityLog and lastCommit from machine
+  - Added 4 tests for activity log and commit tracking in hook state
+  - Tests: 303 passing
+  - Commit: 6a1e134 feat(hooks): add activityLog and lastCommit to ClaudeStreamState
+
+✅ 2026-01-08: Created colors module (New Utilities)
+  - Created src/lib/colors.ts with Claude Code color scheme
+  - COLORS: cyan, green, yellow, red, magenta, gray, white
+  - ELEMENT_COLORS: border, success, warning, error, pending, text, muted
+  - CATEGORY_COLORS: maps read/write/command/meta to colors
+  - STATE_COLORS: maps active/done/error states to colors
+  - Helper functions: getStatusColor, getToolCategoryColor, getToolStateColor, getIconColor
+  - Fixed App.test.tsx missing activityLog/lastCommit in mock state
+  - Tests: 326 passing (23 new tests for colors module)
+  - Commit: e7f6f27 feat(ui): add colors module with Claude Code color scheme
+
+✅ 2026-01-08: Created usePulse hook (New Utilities)
+  - Created src/hooks/usePulse.ts for pulsing animation effects
+  - Toggle boolean on configurable interval (default 500ms)
+  - Supports enabled option to pause/resume pulsing
+  - Cleans up interval on unmount
+  - Returns true initially for immediate visual feedback
+  - Tests: 341 passing (15 new tests for usePulse hook)
+  - Commit: 3f17c24 feat(hooks): add usePulse hook for pulsing animations
+
+✅ 2026-01-08: Created ActivityFeed component (New Components - Activity Feed)
+  - Created src/components/ActivityFeed.tsx as main container for rolling activity feed
+  - Renders thought items with bullet prefix (● symbol)
+  - Shows tool_start items with animated spinner
+  - Displays tool_complete with checkmark/error icon and duration
+  - Shows commit items with short hash (7 chars) and message
+  - Limits display to maxItems (default 20) showing most recent items
+  - Uses colors module for consistent Claude Code styling
+  - Tests: 356 passing (15 new tests for ActivityFeed)
+  - Commit: ad5951d feat(ui): add ActivityFeed component for rolling activity display
+
+✅ 2026-01-08: Extracted ThoughtItem into standalone component
+  - Created src/components/ThoughtItem.tsx with exported ThoughtItem component
+  - Displays │ ● {thought text} with correct colors from ELEMENT_COLORS
+  - Updated ActivityFeed.tsx to import ThoughtItem from new file
+  - Tests: 367 passing (11 new tests for ThoughtItem)
+  - Commit: 79f4019 feat(ui): extract ThoughtItem into standalone component
+
+✅ 2026-01-08: Extracted ToolActivityItem into standalone component
+  - Created src/components/ToolActivityItem.tsx with ToolStartItem and ToolCompleteItem
+  - ToolStartItem: displays spinner with displayName for in-progress tools
+  - ToolCompleteItem: displays ✓/✗ icon with displayName and duration
+  - Both use category-based colors and proper border indentation (│   )
+  - Updated ActivityFeed.tsx to import from ToolActivityItem.tsx
+  - Tests: 392 passing (25 new tests for ToolActivityItem)
+  - Commit: 8e4ff09 feat(ui): extract ToolActivityItem into standalone component
+
+✅ 2026-01-08: Extracted CommitItem into standalone component
+  - Created src/components/CommitItem.tsx with exported CommitItem component
+  - Displays │ ✓ {short hash} - {message} with correct colors
+  - Truncates hash to 7 characters for display
+  - Updated ActivityFeed.tsx to import CommitItem from new file
+  - Tests: 410 passing (18 new tests for CommitItem)
+  - Commit: 23e5163 feat(ui): extract CommitItem into standalone component
+
+✅ 2026-01-08: Created PhaseIndicator component with pulsing animation
+  - Created src/components/PhaseIndicator.tsx for displaying current phase
+  - Phase-specific icons: ○ idle, ◐ reading, ✎ editing, ⚡ running, ● thinking, ✓ done
+  - Phase-specific labels: Waiting, Reading, Editing, Running, Thinking, Done
+  - Uses usePulse hook for animated pulse effect on active phases (dims between cyan/gray)
+  - Exports getPhaseIcon() and getPhaseDisplayLabel() helper functions
+  - Tests: 438 passing (28 new tests for PhaseIndicator)
+  - Commit: 8d82967 feat(ui): add PhaseIndicator component with pulsing animation
+
+✅ 2026-01-08: Updated IterationHeader styling (Component Updates - Styling)
+  - Refactored src/components/IterationHeader.tsx to use ELEMENT_COLORS
+  - Uses ELEMENT_COLORS.border (cyan) for box-drawing characters
+  - Uses ELEMENT_COLORS.text (white) with bold for iteration label
+  - Uses ELEMENT_COLORS.muted (gray) for elapsed time display
+  - Tests: 439 passing (1 new test for ELEMENT_COLORS integration)
+  - Commit: dc8a07c refactor(ui): update IterationHeader to use ELEMENT_COLORS
+
+✅ 2026-01-08: Added pulse effect to TaskTitle (Component Updates - Styling)
+  - Added isPending prop to TaskTitle component (defaults to false)
+  - Integrated usePulse hook for animated pulse effect when pending
+  - Used ELEMENT_COLORS for consistent styling (border, success, text, muted)
+  - Icon color alternates between green and gray when isPending=true
+  - Tests: 445 passing (6 new tests for pending state and pulse effect)
+  - Commit: 6b946d5 feat(ui): add pulse effect to TaskTitle for pending state
+
+✅ 2026-01-08: Updated StatusBar with commit info and ELEMENT_COLORS (Component Updates - Styling)
+  - Imported and applied ELEMENT_COLORS from colors module for consistent styling
+  - Added lastCommit prop to display git commit hash and message
+  - Added formatCommitInfo() helper to format commits as "short_hash - message"
+  - Displays commit info above status bar with checkmark icon and border
+  - Tests: 455 passing (10 new tests for commit display and color integration)
+  - Commit: b5187f5 feat(ui): add commit info display and ELEMENT_COLORS to StatusBar
+
+✅ 2026-01-08: Integrated activity components into App (Integration)
+  - Replaced ToolList with ActivityFeed in App.tsx
+  - Added PhaseIndicator component below TaskTitle for real-time phase display
+  - Added isPending prop to TaskTitle for pulsing pending state
+  - Added lastCommit to IterationResult interface for commit tracking
+  - Updated IterationRunner to show commit info in per-iteration results
+  - Passed lastCommit to StatusBar for commit display
+  - Updated App.test.tsx with new activity feed and phase indicator tests
+  - Added tests for lastCommit in callback and iteration results display
+  - Tests: 464 passing (9 new tests for integration)
+  - Commit: 7de5578 feat(app): integrate ActivityFeed and PhaseIndicator into App
+
+✅ 2026-01-12: Added AskUserQuestion protocol for SPEC creation
+  - Added "Creating SPECs (Interactive)" section to templates/.claude/ralph.md
+  - Defined 3 question batches: technical foundation, feature scope, quality gates
+  - Included example AskUserQuestion call with structured options
+  - Documented interview flow from questions to SPEC generation
+  - Commit: 12064c5 docs(ralph): add AskUserQuestion protocol for SPEC creation interviews
+
+✅ 2026-01-12: Added Task(Explore) protocol for parallel codebase exploration
+  - Added step 2 to Planning Phase: spawn exploration agents if needed
+  - Added detailed Task(Explore) Protocol section with:
+    - When to explore vs skip guidance
+    - Example parallel agent spawning code
+    - What to explore (architecture, patterns, dependencies, conventions)
+    - How to use exploration results in planning
+  - Commit: 953b42c docs(ralph): add Task(Explore) protocol for parallel codebase exploration
+
+✅ 2026-01-12: Added code review protocol for pre-commit agent review
+  - Added "Code Review Protocol" section after "Task Completion Criteria"
+  - Documents when to review (after tests, before commit) vs skip (docs-only, config)
+  - Task agent example with structured review prompt (bugs, tests, patterns, security, performance)
+  - Handling feedback table: CRITICAL (fix), SUGGESTIONS (optional), APPROVED (commit)
+  - Example review flow from implementation to commit
+  - Commit: 81f9433 docs(ralph): add code review protocol for pre-commit agent review
+
+✅ 2026-01-12: Added TodoWrite protocol for sub-task tracking
+  - Added "Sub-Task Tracking Protocol" section after "Code Review Protocol"
+  - Documents when to use TodoWrite (3+ steps) vs skip (atomic tasks)
+  - TodoWrite structure: content, activeForm, status fields
+  - Example breaking down auth feature into 5 trackable sub-tasks
+  - Workflow: start with sub-tasks, track progress, complete before commit
+  - Integration diagram showing SPEC task → sub-tasks → commit flow
+  - Commit: 81b8407 docs(ralph): add TodoWrite protocol for sub-task tracking
+
+✅ 2026-01-12: Created /ralph-iterate skill with frontmatter
+  - Created .claude/skills/ralph-iterate/SKILL.md
+  - Frontmatter: name, description, context: fork, allowed-tools
+  - Skill body includes 6-step iteration protocol (Load Context, Explore, Plan, Implement, Review, Commit)
+  - Commit: d867cb4 feat(skill): create ralph-iterate skill with frontmatter
+
+✅ 2026-01-12: Enhanced Load Context step with detailed TodoWrite guidance
+  - Added 4 sub-sections: SPEC.md reading, STATE.txt checks, index.md reading, TodoWrite
+  - Included explicit TodoWrite example with content, activeForm, status fields
+  - Documented when to skip TodoWrite (atomic tasks, docs-only, <3 steps)
+  - Commit: 6c6645a docs(skill): enhance Load Context step with detailed TodoWrite guidance
+
+✅ 2026-01-12: Enhanced Explore step with parallel agent guidance
+  - Added 4 sub-sections: when to explore, spawn parallel agents, what to explore, using results
+  - Included example with 3 concurrent Task(Explore) calls for auth feature
+  - Added table of exploration prompts by need (architecture, patterns, dependencies, conventions)
+  - Documented 5-step workflow for incorporating exploration results
+  - Commit: 424eba4 docs(skill): enhance Explore step with parallel agent guidance
+
+✅ 2026-01-12: Enhanced Plan step with detailed guidance for writing plan.md
+  - Added 4 sub-sections: Write the Goal, List the Files, Define the Tests, Set Exit Criteria
+  - Included good/bad goal examples showing specific vs vague goals
+  - Complete plan template with JWT token refresh example
+  - Post-planning workflow (review scope, update TodoWrite, proceed to implementation)
+  - Commit: 1125a3a docs(skill): enhance Plan step with detailed guidance for writing plan.md
+
+✅ 2026-01-12: Enhanced Implement step with detailed code and test guidance
+  - Added 5 sub-sections: Write the Code, Write the Tests, Run Tests, Run Type Check, Handle Failures
+  - TodoWrite status updates at each stage of implementation
+  - Implementation checklist for pre-review verification
+  - Common type errors table with fixes
+  - Commit: 9ba6886 docs(skill): enhance Implement step with detailed code and test guidance
+
+✅ 2026-01-12: Enhanced Review step with detailed code review guidance
+  - Added 5 sub-sections: When to Review, Spawn Review Agent, Handle Review Feedback, Review Flow Example, Update TodoWrite
+  - Detailed review agent prompt with 5-point checklist (bugs, tests, patterns, security, performance)
+  - Handling table for CRITICAL/SUGGESTIONS/APPROVED responses
+  - Re-review flow for addressing critical issues
+  - Visual review flow diagram showing decision points
+  - Commit: a4f96a6 docs(skill): enhance Review step with detailed code review guidance
+
+✅ 2026-01-12: Enhanced Commit step with detailed git and tracking guidance
+  - Added 6 sub-sections: Stage Changes, Commit Message, Update index.md, Update SPEC.md, Update STATE.txt, Update TodoWrite
+  - HEREDOC example for proper multi-line commit messages
+  - Commit types table (feat, fix, refactor, test, docs, chore)
+  - index.md entry format with SHA, files, tests, notes, next fields
+  - Commit flow diagram showing complete workflow
+  - Commit checklist for verifying iteration completion
+  - Commit: 51535df docs(skill): enhance Commit step with detailed git and tracking guidance
+
+✅ 2026-01-12: Created validate-iteration.md prompt for Stop hook
+  - Created scripts/validate-iteration.md with LLM validation prompt
+  - 7-point checklist: task, tests, types, commit, index, spec, state
+  - JSON output format with valid/invalid status and issues array
+  - Example outputs for common scenarios (valid, failed tests, no commit)
+  - Special case handling for docs-only, non-TypeScript, partial tasks
+  - Commit: d0a1824 docs(hooks): add validate-iteration.md prompt for Stop hook
+
+✅ 2026-01-12: Added settings.json.example with Stop hook configuration
+  - Created templates/.claude/settings.json.example
+  - Stop hook with type: prompt pointing to scripts/validate-iteration.md
+  - Common Ralph permission patterns (npm test, vitest, git commands)
+  - Commit: 1fc21e0 docs(hooks): add settings.json.example with Stop hook configuration
+
+✅ 2026-01-12: Added Hooks Configuration section to ralph.md
+  - New "Hooks Configuration" section after "Error Recovery"
+  - Documents Stop hook purpose and settings.json setup
+  - Explains 7-point validation checklist and JSON output format
+  - Includes troubleshooting table for common validation failures
+  - Commit: b51ebad docs(hooks): add Hooks Configuration section to ralph.md
+
+✅ 2026-01-12: Synced templates/.claude/ralph.md with .claude/CLAUDE.md
+  - Added 11 sections from CLAUDE.md for template consistency
+  - Comment examples, test structure, file organization, commit examples
+  - Performance considerations, auth/auth, dependencies sections
+  - Code review checklist, expanded anti-patterns, tools/linters
+  - Added 6th philosophical principle (Documented over undocumented)
+  - Commit: 10e84d2 docs(ralph): sync ralph.md with CLAUDE.md for template consistency
+
+✅ 2026-01-12: Added Claude Code Native Features overview section
+  - Table summarizing 5 key integrations (AskUserQuestion, Task agents, TodoWrite, Stop hook)
+  - Workflow diagram showing how features work together in iteration loop
+  - Placed after Required Reading, before detailed protocol sections
+  - Commit: eb573dd docs(ralph): add Claude Code Native Features overview section
+
+✅ 2026-01-12: Added ralph-iterate skill to templates for init command
+  - Copied .claude/skills/ralph-iterate/SKILL.md to templates
+  - Init command already does recursive copying, no code changes needed
+  - Tests: 542 passing (no regressions)
+  - Commit: 8ec2754 feat(init): add ralph-iterate skill to templates
+
+✅ 2026-01-12: Added Phase 1 - headless flag and event emitter
+  - Created src/lib/headless-emitter.ts with RalphEvent types (9 event kinds)
+  - Added --headless flag to CLI run command
+  - Added executeHeadlessRun placeholder (full implementation in Phase 2)
+  - Wired conditional: headless skips Ink UI, uses JSON stdout
+  - Tests: 555 passing (13 new tests for headless-emitter)
+  - Commit: da3e6ec feat(headless): add Phase 1 - headless flag and event emitter
+
+✅ 2026-01-12: Added Phase 2 - headless runner
+  - Created src/lib/headless-runner.ts with executeHeadlessRun() and runSingleIteration()
+  - Re-uses StreamParser and StateMachine for tool tracking and event parsing
+  - Emits JSON events via headless-emitter (started, iteration, tool, commit, task_complete, iteration_done, stuck, complete, failed)
+  - Tracks task completion by comparing SPEC.md before/after each iteration
+  - Stuck detection: exits with code 1 after N iterations without task progress
+  - Exit codes: 0=complete, 1=stuck, 2=max iterations, 3=error
+  - Added --stuck-threshold CLI option (default 3)
+  - Wired executeHeadlessRun in CLI to call headless runner
+  - Tests: 577 passing (22 new tests for headless-runner)
+
+✅ 2026-01-12: Completed Phase 3, 4, 5 - stuck detection, exit codes, tests verified
+  - Phase 3 (stuck detection) was already implemented in Phase 2 entry
+  - Phase 4 (exit codes) was already implemented in Phase 2 entry
+  - Phase 5 (tests) were already written: 13 tests for headless-emitter, 22 tests for headless-runner
+  - Fixed TypeScript type error in headless-runner.test.ts (Readable stream type for mock stdout/stderr)
+  - Tests: 577 passing, type check passes
+  - All v0.3 headless mode phases complete
+

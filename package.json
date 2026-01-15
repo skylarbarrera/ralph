@@ -1,0 +1,36 @@
+{
+  "name": "ralph",
+  "version": "0.3.1",
+  "description": "Autonomous AI coding loops - run Claude on autopilot",
+  "type": "module",
+  "main": "src/cli.tsx",
+  "bin": {
+    "ralph": "./bin/ralph"
+  },
+  "scripts": {
+    "ralph": "tsx src/cli.tsx run",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src tests"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "ink": "^4.4.1",
+    "ink-spinner": "^5.0.0",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@vitest/coverage-v8": "^1.2.0",
+    "ink-testing-library": "^4.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
