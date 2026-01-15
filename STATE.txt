@@ -447,3 +447,15 @@
   - Tests mock process.stdin and child_process.spawn for isolated testing
   - Tests: 593 passing (3 new), type check passes
   - Commit: f332846 feat(spec): add interactive mode with create-spec skill
+
+✅ 2026-01-15: Added autonomous spec mode with review loop
+  - Added --auto and --max-attempts flags to ralph spec command
+  - Created generateSpecAutonomous() function with review loop in spec-generator.ts
+  - Implemented runReviewSpec() to invoke /review-spec skill and parse output
+  - Implemented parseReviewOutput() to extract PASS/FAIL and concerns from review
+  - Implemented refineSpec() to regenerate spec based on review feedback
+  - Review loop runs up to maxAttempts (default 3) until PASS or max reached
+  - Exit codes: 0 on success, 1 on max attempts without passing review
+  - Added 4 comprehensive tests for autonomous mode (review success, refinement, max attempts, parsing)
+  - Tests: 597 passing (4 new), type check passes
+  - Commit: 665cb20 feat(spec): add autonomous mode with review loop

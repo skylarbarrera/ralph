@@ -53,7 +53,7 @@ Ralph is a working CLI with:
 
 ### Phase 5: Autonomous Spec Mode
 
-- [ ] Add autonomous mode for `ralph spec --auto` or `ralph spec --headless`
+- [x] Add autonomous mode for `ralph spec --auto` or `ralph spec --headless`
   - No user present
   - Generate initial spec with `create-spec` skill logic
   - Run `review-spec` validation on generated spec

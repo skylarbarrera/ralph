@@ -325,3 +325,9 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 593 passing (3 new tests for spec-generator)
 - notes: Modified generateSpec() to use /create-spec skill in interactive mode (default) for structured interviews with AskUserQuestion; headless mode still uses embedded prompt for autonomous generation; added comprehensive tests with mocking for process.stdin and child_process.spawn
 - next: Phase 5 - Add autonomous spec mode for ralph spec --auto or --headless
+
+## 665cb20 — feat(spec): add autonomous mode with review loop
+- files: src/cli.tsx, src/lib/spec-generator.ts, tests/lib/spec-generator.test.ts
+- tests: 597 passing (4 new tests for autonomous mode)
+- notes: Added --auto and --max-attempts flags; created generateSpecAutonomous() with review loop; runReviewSpec() invokes /review-spec skill; parseReviewOutput() extracts PASS/FAIL and concerns; refineSpec() regenerates based on feedback; review loop runs up to maxAttempts (default 3); exit codes 0 on success, 1 on max attempts
+- next: Phase 6 - Create harness abstraction in src/lib/harness/
