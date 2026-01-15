@@ -36,7 +36,7 @@ Ralph is a working CLI with:
 
 ### Phase 3: Verify Skill
 
-- [ ] Create `skills/verify/SKILL.md` for pre-commit verification
+- [x] Create `skills/verify/SKILL.md` for pre-commit verification
   - Skill for Claude to use during iteration before committing
   - Claude detects what to run from codebase (package.json scripts, tsconfig, eslint config, etc.)
   - No configuration needed - Claude figures it out from context
