@@ -412,3 +412,18 @@
   - Tests: 577 passing, type check passes
   - All v0.3 headless mode phases complete
 
+
+✅ 2026-01-15: Migrated skills to skills/ directory for add-skill compatibility
+  - Created skills/create-spec/SKILL.md and skills/ralph-iterate/SKILL.md
+  - Skills have correct add-skill frontmatter format (name, description, context, allowed-tools)
+  - Maintained backward compatibility - .claude/skills/ files remain unchanged
+  - Tests: 590 passing, type check passes
+  - Commit: 67a5fff feat(skills): migrate skills to skills/ directory for add-skill compatibility
+
+✅ 2026-01-15: Created review-spec skill for SPEC validation
+  - Created skills/review-spec/SKILL.md with comprehensive validation logic
+  - Format checks: checkbox syntax, no code snippets, no file paths, deliverable sub-bullets, task batching
+  - Content critique: problem-solution fit, integration awareness, scalability, scope appropriateness
+  - Output format: PASS/FAIL with prioritized concerns (HIGH/MEDIUM/LOW) and actionable recommendations
+  - Tests: 590 passing, type check passes
+  - Commit: 88b9966 feat(skills): create review-spec skill for SPEC validation

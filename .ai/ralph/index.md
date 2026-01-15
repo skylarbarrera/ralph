@@ -302,3 +302,14 @@ Commit-anchored memory log. Each entry summarizes one completed task.
 - tests: 577 passing (type check passes)
 - notes: Phase 3/4/5 were already implemented in Phase 2; fixed TypeScript type error (Readable stream type for mock stdout/stderr); marked all phases complete in SPEC.md
 - next: v0.3 complete - Factory can now use `ralph run --headless` for programmatic integration
+## 67a5fff — feat(skills): migrate skills to skills/ directory for add-skill compatibility
+- files: skills/create-spec/SKILL.md, skills/ralph-iterate/SKILL.md, .ai/ralph/plan.md
+- tests: 590 passing
+- notes: Created skills/ directory structure; copied create-spec and ralph-iterate with correct frontmatter (name, description, context, allowed-tools); .claude/skills/ remains for local dev
+- next: Phase 2 - Create review-spec skill for SPEC validation
+
+## 88b9966 — feat(skills): create review-spec skill for SPEC validation
+- files: skills/review-spec/SKILL.md, .ai/ralph/plan.md
+- tests: 590 passing
+- notes: Comprehensive validation with format checks (checkbox syntax, no code snippets, no file paths, deliverable sub-bullets) and content critique (problem-solution fit, integration awareness, scalability, scope); outputs PASS/FAIL with prioritized concerns and actionable recommendations
+- next: Phase 3 - Create verify skill for pre-commit verification

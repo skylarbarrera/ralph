@@ -21,7 +21,7 @@ Ralph is a working CLI with:
 
 ### Phase 1: Skill Directory Migration
 
-- [ ] Move skills from `.claude/skills/` to `skills/` directory
+- [x] Move skills from `.claude/skills/` to `skills/` directory
   - Create `skills/create-spec/SKILL.md` from existing `.claude/skills/create-spec/SKILL.md`
   - Create `skills/ralph-iterate/SKILL.md` from existing `.claude/skills/ralph-iterate/SKILL.md`
   - Update skill frontmatter to match add-skill format (vercel-labs/add-skill)
@@ -29,7 +29,7 @@ Ralph is a working CLI with:
 
 ### Phase 2: Review Skill
 
-- [ ] Create `skills/review-spec/SKILL.md` for spec validation
+- [x] Create `skills/review-spec/SKILL.md` for spec validation
   - Format checks: checkbox syntax, no code snippets, no file paths, deliverable sub-bullets
   - Content critique: problem-solution fit, integration awareness, scalability, scope
   - Output: PASS/FAIL on format, list of concerns, improvement suggestions
