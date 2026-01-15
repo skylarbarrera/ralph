@@ -1,164 +1,105 @@
-# Ralph v0.3 - Headless Mode for Factory Integration
+# Ralph v1.0 - Skill-Based Architecture
 
-Add headless mode to enable programmatic integration with Factory orchestrator and other automation tools.
+Convert Ralph to a skill-based architecture with verification capabilities for v1 release.
 
-## Current State (v0.2.0)
+## Goal
 
-Ralph is a working CLI that:
-- Spawns `claude` CLI with `--output-format stream-json`
-- Parses Claude's native stream-json output via `StreamParser`
-- Tracks iteration state via `StateMachine` (phases: idle, reading, editing, running, thinking, done)
-- Has Ink-based terminal UI components (IterationHeader, TaskTitle, ToolList, StatusBar)
-- Tracks stats (reads, writes, commands, meta ops)
-- Logs raw output to `./runs/{timestamp}.jsonl`
-- Runs N iterations or until SPEC is complete
+Transform Ralph into a skill-installable tool where major operations are Claude Code skills, add verification capabilities, and design a harness abstraction layer for future multi-harness support.
 
-**CLI:**
-```bash
-ralph run           # 1 iteration
-ralph run -n 10     # 10 iterations
-ralph run --all     # until SPEC complete (max 100)
-```
+## Current State
+
+Ralph is a working CLI with:
+- Commands: `init`, `run`, `validate`, `spec`, `upgrade`
+- Headless mode for programmatic integration
+- Skills in `.claude/skills/`: `create-spec`, `ralph-iterate`
+- Spec generation via `src/lib/spec-generator.ts`
+- Stream parsing and state machine for Claude output
 
 ---
 
-## What Factory Needs from Ralph
+## Tasks
 
-The Factory worker needs to:
-1. Run Ralph headlessly (no interactive Ink UI)
-2. Get structured output for orchestrator heartbeats
-3. Know when tasks complete, files change, commits happen
-4. Get exit status (success/stuck/failed)
+### Phase 1: Skill Directory Migration
 
----
+- [ ] Move skills from `.claude/skills/` to `skills/` directory
+  - Create `skills/create-spec/SKILL.md` from existing `.claude/skills/create-spec/SKILL.md`
+  - Create `skills/ralph-iterate/SKILL.md` from existing `.claude/skills/ralph-iterate/SKILL.md`
+  - Update skill frontmatter to match add-skill format (vercel-labs/add-skill)
+  - Keep `.claude/skills/` as symlinks or copies for local development
 
-## Phase 1: Add Headless Flag
+### Phase 2: Review Skill
 
-- [x] Add `--headless` flag to CLI in `src/cli.tsx`
-- [x] When headless, skip Ink render, use JSON event emitter to stdout
-- [x] Create `src/lib/headless-emitter.ts` with event types
+- [ ] Create `skills/review-spec/SKILL.md` for spec validation
+  - Format checks: checkbox syntax, no code snippets, no file paths, deliverable sub-bullets
+  - Content critique: problem-solution fit, integration awareness, scalability, scope
+  - Output: PASS/FAIL on format, list of concerns, improvement suggestions
 
-### Event Emitter
+### Phase 3: Verify Skill
 
-```typescript
-// src/lib/headless-emitter.ts
+- [ ] Create `skills/verify/SKILL.md` for pre-commit verification
+  - Skill for Claude to use during iteration before committing
+  - Claude detects what to run from codebase (package.json scripts, tsconfig, eslint config, etc.)
+  - No configuration needed - Claude figures it out from context
+  - Runs tests, type check, lint as appropriate for the project
+  - Reports pass/fail status with errors
 
-export type RalphEvent =
-  | { event: 'started'; spec: string; tasks: number; timestamp: string }
-  | { event: 'iteration'; n: number; phase: string }
-  | { event: 'tool'; type: 'read' | 'write' | 'bash'; path?: string }
-  | { event: 'commit'; hash: string; message: string }
-  | { event: 'task_complete'; index: number; text: string }
-  | { event: 'iteration_done'; n: number; duration_ms: number; stats: Stats }
-  | { event: 'stuck'; reason: string; iterations_without_progress: number }
-  | { event: 'complete'; tasks_done: number; total_duration_ms: number }
-  | { event: 'failed'; error: string };
+### Phase 4: Interactive Spec Mode
 
-export function emit(event: RalphEvent): void {
-  console.log(JSON.stringify(event));
-}
-```
+- [ ] Update `ralph spec` command to support interactive mode
+  - Default behavior: interactive interview with AskUserQuestion
+  - User is present, Claude interviews user, asks clarifying questions
+  - User provides answers, reviews output, can request changes before finalizing
+  - Use `create-spec` skill for interview flow
 
-## Phase 2: Headless Runner
+### Phase 5: Autonomous Spec Mode
 
-- [x] Create `src/lib/headless-runner.ts`
-- [x] Re-use existing `StreamParser` and `StateMachine`
-- [x] Emit events instead of updating Ink UI
-- [x] Wire up in CLI when `--headless` is passed
+- [ ] Add autonomous mode for `ralph spec --auto` or `ralph spec --headless`
+  - No user present
+  - Generate initial spec with `create-spec` skill logic
+  - Run `review-spec` validation on generated spec
+  - If review finds issues, feed feedback back for refinement
+  - Loop until quality threshold met or max attempts (3, configurable) reached
+  - Exit with error on max attempts without passing review
 
-```typescript
-// src/lib/headless-runner.ts
+### Phase 6: Harness Abstraction
 
-export async function executeHeadlessRun(options: RunOptions): Promise<void> {
-  const spec = loadSpec(options.cwd);
-  emit({ event: 'started', spec: 'SPEC.md', tasks: spec.tasks.length, timestamp: new Date().toISOString() });
+- [ ] Create harness interface in `src/lib/harness/`
+  - Define `Harness` interface: run skill with context, return result (success/failure, output)
+  - Implement `ClaudeCodeHarness` as default adapter (only implementation for v1)
+  - Config selection: `.ralph/config.yml` has `harness: claude-code`
+  - Environment variable override: `RALPH_HARNESS=codex`
+  - CLI flag override: `ralph run --harness codex`
+  - Design interface so other harnesses (Codex, OpenCode) can be added later
 
-  let iterationsWithoutProgress = 0;
+### Phase 7: Tests and Documentation
 
-  for (let i = 1; i <= options.iterations; i++) {
-    const tasksBefore = countCompleteTasks(spec);
-
-    emit({ event: 'iteration', n: i, phase: 'starting' });
-
-    const result = await runSingleIteration(options);
-
-    // Forward tool events from StateMachine
-    // result.toolGroups.forEach(group => emit tool events)
-
-    const updatedSpec = loadSpec(options.cwd);
-    const tasksAfter = countCompleteTasks(updatedSpec);
-
-    if (tasksAfter > tasksBefore) {
-      iterationsWithoutProgress = 0;
-      // Emit task_complete for each newly completed task
-    } else {
-      iterationsWithoutProgress++;
-    }
-
-    emit({ event: 'iteration_done', n: i, duration_ms: result.durationMs, stats: result.stats });
-
-    if (iterationsWithoutProgress >= options.stuckThreshold) {
-      emit({ event: 'stuck', reason: 'No task progress', iterations_without_progress: iterationsWithoutProgress });
-      process.exit(1);
-    }
-
-    if (isSpecComplete(updatedSpec)) {
-      emit({ event: 'complete', tasks_done: tasksAfter, total_duration_ms: totalDuration });
-      process.exit(0);
-    }
-  }
-
-  process.exit(2); // Max iterations reached
-}
-```
-
-## Phase 3: Stuck Detection
-
-- [x] Add `--stuck-threshold <n>` CLI option (default 3)
-- [x] Track consecutive iterations without task completion
-- [x] Emit `stuck` event and exit 1 when threshold exceeded
-
-## Phase 4: Exit Codes
-
-- [x] Exit 0 = All tasks complete
-- [x] Exit 1 = Stuck (no progress after threshold)
-- [x] Exit 2 = Max iterations reached
-- [x] Exit 3 = Fatal error
-
-## Phase 5: Tests
-
-- [x] Unit tests for `headless-emitter.ts`
-- [x] Unit tests for `headless-runner.ts`
-- [x] Integration test: headless run with mock SPEC
-- [x] Integration test: stuck detection triggers correctly
+- [ ] Add tests for new functionality
+  - Unit tests for review-spec validation logic
+  - Integration test: spec generation with review loop
+  - Test skills work with `npx add-skill skylarbarrera/ralph`
+  - Update README with new commands and skill installation
 
 ---
 
-## CLI Changes Summary
+## Config
 
-```typescript
-// In src/cli.tsx
+Ralph reads from `.ralph/config.yml` when present:
 
-program
-  .command('run')
-  .option('--headless', 'Output JSON events instead of UI')
-  .option('--stuck-threshold <n>', 'Iterations without progress before stuck', '3')
-  .action((options) => {
-    if (options.headless) {
-      executeHeadlessRun(options);
-    } else {
-      executeRun(options);  // existing Ink UI
-    }
-  });
+```yaml
+harness: claude-code  # Default harness (only config needed)
 ```
+
+Defaults are used when config is not present.
 
 ---
 
 ## Success Criteria
 
-- `ralph run --headless` outputs JSONL events to stdout (no Ink UI)
-- Events include: started, iteration, tool, commit, task_complete, iteration_done, stuck, complete, failed
-- Exit codes are deterministic and documented
-- Stuck detection works with configurable threshold
+- Skills installable via `npx add-skill skylarbarrera/ralph`
+- Skills installable selectively: `npx add-skill skylarbarrera/ralph --skill create-spec --skill verify`
+- `ralph spec "description"` runs interactive interview (user present)
+- `ralph spec --auto "description"` runs autonomous generation with review loop
+- Verify skill works during iteration (Claude uses it to check work before committing)
+- Harness interface designed for future extensibility (only Claude Code implemented for v1)
 - All existing tests pass
-- New tests cover headless mode
+- New functionality has test coverage
