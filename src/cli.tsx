@@ -8,6 +8,22 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Read version from package.json
+function getVersion(): string {
+  try {
+    // Try from dist location (npm installed)
+    let pkgPath = join(__dirname, '..', 'package.json');
+    if (!existsSync(pkgPath)) {
+      // Try from src location (development)
+      pkgPath = join(__dirname, '..', '..', 'package.json');
+    }
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    return pkg.version || '1.0.0';
+  } catch {
+    return '1.0.0';
+  }
+}
 import { IterationRunner } from './App.js';
 import { runInit } from './commands/init.js';
 import { validateProject } from './commands/run.js';
@@ -198,7 +214,7 @@ function main(): void {
   program
     .name('ralphie')
     .description('Autonomous AI coding loops')
-    .version('0.3.1');
+    .version(getVersion());
 
   program
     .command('init')
